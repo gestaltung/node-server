@@ -248,8 +248,16 @@ exports.getRecentTracks = function(req, res, next) {
               t.artist = track.artist["#text"];
               t.name = track.name;
               t.album = track.album["#text"];
+              if (track.date) {
+                t.date = track.date["#text"];
+              }
+              else {
+                t.date = "now";
+              }
+              
               tracks.push(t);
             });
+            // done(null, data);
             done(null, tracks.slice(0,10));
           },
           error: function(err) {
