@@ -132,6 +132,7 @@ app.get('/account/unlink/:provider', passportConf.isAuthenticated, userControlle
  */
 app.get('/api', apiController.getApi);
 app.get('/api/lastfm', apiController.getLastfm);
+app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
 app.get('/api/nyt', apiController.getNewYorkTimes);
 app.get('/api/scraping', apiController.getScraping);
 app.get('/api/twilio', apiController.getTwilio);

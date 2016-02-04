@@ -225,7 +225,8 @@ exports.getNewYorkTimes = function(req, res, next) {
  * GET /api/lastfm
  * Last.fm API example.
  */
-exports.getLastfm = function(req, res, next) {
+
+exports.getRecentTracks = function(req, res, next) {
   request = require('request');
   LastFmNode = require('lastfm').LastFmNode;
 
@@ -235,9 +236,70 @@ exports.getLastfm = function(req, res, next) {
   });
 
   async.parallel({
+    topTracks: function(done) {
+      lastfm.request('user.getRecentTracks', {
+        user: 'Zacoppotamus',
+        handlers: {
+          success: function(data) {
+
+            var tracks = [];
+            _.each(data.recenttracks.track, function(track) {
+              var t = {}
+              t.artist = track.artist["#text"];
+              t.name = track.name;
+              t.album = track.album["#text"];
+              tracks.push(t);
+            });
+            done(null, tracks.slice(0,10));
+          },
+          error: function(err) {
+            done(err);
+            // res.json(err);
+          }
+        }
+      });
+    }
+  },
+  function(err, results) {
+    if (err) {
+      return next(err.message);
+    }
+    
+    res.json(results);
+  })
+};
+
+exports.getLastfm = function(req, res, next) {
+  request = require('request');
+  LastFmNode = require('lastfm').LastFmNode;
+
+  var lastfm = new LastFmNode({
+    api_key: process.env.LASTFM_KEY,
+    secret: process.env.LASTFM_SECRET
+  });
+
+  var userTopTracks = function(done) {
+    lastfm.request('user.getWeeklyTrackChart', {
+      user: 'Zacoppotamus',
+      handlers: {
+        success: function(data) {
+          var tracks = [];
+          _.each(data.toptracks.track, function(track) {
+            tracks.push(track);
+          });
+          done(null, tracks.slice(0,10));
+        },
+        error: function(err) {
+          done(err);
+        }
+      }
+    });
+  }
+
+  async.parallel({
     artistInfo: function(done) {
       lastfm.request('artist.getInfo', {
-        artist: 'The Pierces',
+        artist: 'Sonic Youth',
         handlers: {
           success: function(data) {
             done(null, data);
@@ -250,7 +312,7 @@ exports.getLastfm = function(req, res, next) {
     },
     artistTopTracks: function(done) {
       lastfm.request('artist.getTopTracks', {
-        artist: 'The Pierces',
+        artist: 'Sonic Youth',
         handlers: {
           success: function(data) {
             var tracks = [];
@@ -265,9 +327,27 @@ exports.getLastfm = function(req, res, next) {
         }
       });
     },
+    userTopTracks: function(done) {
+      lastfm.request('user.getWeeklyTrackChart', {
+        user: 'Zacoppotamus',
+        handlers: {
+          success: function(data) {
+            var userTracks = [];
+            _.each(data.weeklytrackchart.track, function(track) {
+              userTracks.push(track);
+            });
+            console.log(userTracks.slice(0,2));
+            done(null, userTracks.slice(0,10));
+          },
+          error: function(err) {
+            done(err);
+          }
+        }
+      });
+    },
     artistTopAlbums: function(done) {
       lastfm.request('artist.getTopAlbums', {
-        artist: 'The Pierces',
+        artist: 'Sonic Youth',
         handlers: {
           success: function(data) {
             var albums = [];
@@ -295,11 +375,20 @@ exports.getLastfm = function(req, res, next) {
       stats: results.artistInfo.artist.stats,
       similar: results.artistInfo.artist.similar.artist,
       topAlbums: results.artistTopAlbums,
-      topTracks: results.artistTopTracks
+      topTracks: results.artistTopTracks,
+      userTracks: results.userTracks
     };
+
+    // User's top tracks
+    var tracks = {
+      userTracks: results.userTracks
+    };
+
+    // console.log(artist.userTracks.weeklytrackchart.track)
     res.render('api/lastfm', {
       title: 'Last.fm API',
-      artist: artist
+      artist: artist,
+      tracks: tracks.userTracks
     });
   });
 };

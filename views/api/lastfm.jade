@@ -45,3 +45,7 @@ block content
     for similarArtist in artist.similar
       li
         a(href='#{similarArtist.url}') #{similarArtist.name}
+
+  h3 Zac's Last Scrobbled Album
+  ul.list-unstyled.list-inline
+    p #{artist.userTracks}
