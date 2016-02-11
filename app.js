@@ -165,6 +165,12 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
 /**
  * OAuth authorization routes. (API examples)
  */
+
+app.get('/auth/moves', passport.authenticate('moves', {scope: ['default', 'activity', 'location']}));
+app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect: '/api' }), function(req, res) {
+ res.redirect('/');
+});
+
 app.get('/auth/foursquare', passport.authorize('foursquare'));
 app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
   res.redirect('/api/foursquare');

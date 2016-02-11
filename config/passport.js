@@ -8,6 +8,7 @@ var TwitterStrategy = require('passport-twitter').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+var MovesStrategy = require('passport-moves').Strategy;
 var OpenIDStrategy = require('passport-openid').Strategy;
 var OAuthStrategy = require('passport-oauth').OAuthStrategy;
 var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
@@ -188,6 +189,30 @@ passport.use(new TwitterStrategy({
 //     });
 //   }
 // ));
+
+/**
+ * Moves API OAuth
+ */
+passport.use(new MovesStrategy({
+    clientID: process.env.MOVES_ID,
+    clientSecret: process.env.MOVES_SECRET,
+    callbackURL: "http://127.0.0.1:3000/auth/moves/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOne({ movesId: profile.id }, function(err, existingUser) {
+      if (existingUser) {
+        return done(null, existingUser);
+      }
+      var user = new User();
+      console.log(profile);
+      user.moves = profile.id;
+      user.save(function(err) {
+        done(err, user);
+      });
+    });
+  }
+));
+
 
 /**
  * Foursquare API OAuth.
