@@ -8,6 +8,7 @@ var userSchema = new mongoose.Schema({
 
   facebook: String,
   moves: String,
+  fitbit: String,
   twitter: String,
   google: String,
   github: String,

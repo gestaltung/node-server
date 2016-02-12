@@ -12,6 +12,7 @@ var Twit;
 var paypal;
 var ig;
 var Y;
+var fitbit;
 var request;
 
 var _ = require('lodash');
@@ -179,6 +180,61 @@ exports.getNewYorkTimes = function(req, res, next) {
     });
   });
 };
+
+/**
+ * GET /api/fitbit
+ */
+exports.getFitbitProfile = function(req, res, next) {
+  fitbit = require("fitbit-node");
+  var token = _.find(req.user.tokens, { kind: 'fitbit' });
+  console.log("token", token);
+  // var token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTUyOTYzNTIsInNjb3BlcyI6InJwcm8gcmhyIHJsb2MgcmFjdCIsInN1YiI6IjQ5Q05HWSIsImF1ZCI6IjIyN0dISCIsImlzcyI6IkZpdGJpdCIsInR5cCI6ImFjY2Vzc190b2tlbiIsImlhdCI6MTQ1NTI5Mjc1Mn0.FF-rQoVS7x_FdRXKrxx35A54N7E4K2OpzhhQdmhHW_0";
+  var client = new fitbit(process.env.FITBIT_CLIENT_ID, process.env.FITBIT_SECRET);
+
+  async.parallel({
+    getProfile: function(done) {
+      client.get("/profile.json", token.accessToken).then(function(err, results) {
+        console.log(err);
+        done(err, results)
+      })
+    }
+  },
+  function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.render('api/fitbit', {
+      title: 'Fitbit API',
+      data: results.getProfile
+    });
+  });
+}
+
+/**
+ * GET /api/moves
+ */
+exports.getMovesProfile = function(req, res, next) {
+  request = require('request');
+  var token = _.find(req.user.tokens, { kind: 'moves' });
+
+  var query = querystring.stringify({
+    'access_token': token.accessToken,
+  });
+  var url = 'https://api.moves-app.com/api/1.1/user/profile?' + query;
+
+  request.get(url, function(err, request, body) {
+    if (err) {
+      return next(err);
+    }
+    if (request.statusCode === 403) {
+      return next(Error('Missing or Invalid Moves API Key'));
+    }
+    console.log(JSON.parse(body));
+    res.render('api/moves', {
+      data: JSON.parse(body)
+    })
+  })
+}
 
 /**
  * GET /api/lastfm

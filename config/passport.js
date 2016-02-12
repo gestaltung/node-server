@@ -8,6 +8,7 @@ var TwitterStrategy = require('passport-twitter').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
 var MovesStrategy = require('passport-moves').Strategy;
 var OpenIDStrategy = require('passport-openid').Strategy;
 var OAuthStrategy = require('passport-oauth').OAuthStrategy;
@@ -119,7 +120,6 @@ passport.use(new FacebookStrategy({
 
 
 // Sign in with Twitter.
-
 passport.use(new TwitterStrategy({
   consumerKey: process.env.TWITTER_KEY,
   consumerSecret: process.env.TWITTER_SECRET,
@@ -170,22 +170,44 @@ passport.use(new TwitterStrategy({
 
 
 /**
+ * Fitbit API OAuth
+ */
+passport.use(new FitbitStrategy({
+    clientID: process.env.FITBIT_CLIENT_ID,
+    clientSecret: process.env.FITBIT_SECRET,
+    callbackURL: "http://localhost:3000/auth/fitbit/callback",
+    passReqToCallback: true
+  },
+  function(req, accessToken, refreshToken, profile, done) {
+    // User is alredy logged in, so we're just linking Fitbit account
+    // TO DO: Check it there's already a token and if there is, update it
+    User.findById(req.user.id, function(err, user) {
+      user.fitbit = profile.id;
+      user.tokens.push({ kind: 'fitbit', accessToken: accessToken });
+      user.save(function(err) {
+        req.flash('info', { msg: 'Fitbit account has been linked.' });
+        done(err, user);
+      });
+    });
+  }
+))
+
+/**
  * Moves API OAuth
  */
 passport.use(new MovesStrategy({
     clientID: process.env.MOVES_ID,
     clientSecret: process.env.MOVES_SECRET,
-    callbackURL: "http://127.0.0.1:3000/auth/moves/callback"
+    callbackURL: "http://localhost:3000/auth/moves/callback",
+    passReqToCallback: true
   },
-  function(accessToken, refreshToken, profile, done) {
-    User.findOne({ movesId: profile.id }, function(err, existingUser) {
-      if (existingUser) {
-        return done(null, existingUser);
-      }
-      var user = new User();
-      console.log(profile);
+  function(req, accessToken, refreshToken, profile, done) {
+    // User is alredy logged in, so we're just linking Moves account
+    User.findById(req.user.id, function(err, user) {
       user.moves = profile.id;
+      user.tokens.push({ kind: 'moves', accessToken: accessToken });
       user.save(function(err) {
+        req.flash('info', { msg: 'Moves account has been linked.' });
         done(err, user);
       });
     });

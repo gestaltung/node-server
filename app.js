@@ -114,7 +114,7 @@ app.get('/', homeController.index, passportConf.isAuthenticated);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
-app.get('/link', userController.getLink, passportConf.isAuthenticated)
+app.get('/link', passportConf.isAuthenticated, userController.getLink)
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
@@ -134,6 +134,8 @@ app.get('/account/unlink/:provider', passportConf.isAuthenticated, userControlle
  * API examples routes.
  */
 app.get('/api', apiController.getApi);
+app.get('/api/fitbit', apiController.getFitbitProfile);
+app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
 app.get('/api/lastfm', apiController.getLastfm);
 app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
 app.get('/api/nyt', apiController.getNewYorkTimes);
@@ -168,9 +170,16 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
 /**
  * OAuth authorization routes. (API examples)
  */
-
+app.get('/auth/fitbit', passport.authenticate('fitbit', {
+  scope: ['activity', 'heartrate', 'location', 'profile'],
+  session: true
+}));
+app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/link' }), function(req, res) {
+  console.log(req);
+ res.redirect('/');
+});
 app.get('/auth/moves', passport.authenticate('moves', {scope: ['default', 'activity', 'location']}));
-app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect: '/api' }), function(req, res) {
+app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect: '/link' }), function(req, res) {
  res.redirect('/');
 });
 
