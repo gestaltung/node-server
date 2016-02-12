@@ -18,6 +18,15 @@ exports.getLogin = function(req, res) {
   });
 };
 
+exports.getLink = function(req, res) {
+  if (!req.user) {
+    return res.redirect('/login');
+  }
+  else {
+    return res.render('link');
+  }
+}
+
 /**
  * POST /login
  * Sign in using email and password.
