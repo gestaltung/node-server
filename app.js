@@ -136,6 +136,7 @@ app.get('/account/unlink/:provider', passportConf.isAuthenticated, userControlle
 app.get('/api', apiController.getApi);
 app.get('/api/fitbit', apiController.getFitbitProfile);
 app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
+app.get('/api/getDailySummary', apiController.getDailySummary);
 app.get('/api/lastfm', apiController.getLastfm);
 app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
 app.get('/api/nyt', apiController.getNewYorkTimes);

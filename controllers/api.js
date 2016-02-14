@@ -219,8 +219,9 @@ exports.getMovesProfile = function(req, res, next) {
 
   var query = querystring.stringify({
     'access_token': token.accessToken,
+    'trackPoints': true
   });
-  var url = 'https://api.moves-app.com/api/1.1/user/profile?' + query;
+  var url = 'https://api.moves-app.com/api/1.1/user/places/daily/20160213?' + query;
 
   request.get(url, function(err, request, body) {
     if (err) {
@@ -229,11 +230,65 @@ exports.getMovesProfile = function(req, res, next) {
     if (request.statusCode === 403) {
       return next(Error('Missing or Invalid Moves API Key'));
     }
-    console.log(JSON.parse(body));
-    res.render('api/moves', {
-      data: JSON.parse(body)
-    })
+    // console.log(JSON.parse(body));
+    res.json(JSON.parse(body));
+    // res.render('api/moves', {
+    //   data: JSON.parse(body)
+    // })
   })
+}
+
+/**
+ * CRON Jobs will be defined here
+ * This function will periodically merge all data produced by users
+ * in their linked apps.
+ *
+ * For the time, include Moves, Last.fm, Weather.
+ * Weather data will be gathered based on avg lat/lon data from Moves.
+ */
+
+/**
+ * Daily Routines. Include merging all APIs and inserting into DB
+ */
+
+exports.getDailySummary = function(req, res, next) {
+  // Last.fm and Moves for now
+  // Yesterday is the day we have full data on so request previous day.
+  request = require('request');
+  var token = _.find(req.user.tokens, { kind: 'moves' });
+  
+  var d = new Date();
+  var dateString = '' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + (d.getDate()-1)).slice(-2);
+  
+  var baseUrl = 'https://api.moves-app.com/api/1.1/user';
+  var query = querystring.stringify({
+    'access_token': token.accessToken,
+    'trackPoints': true
+  });
+
+  async.parallel({
+    movesPlaces: function(done) {
+      var url = baseUrl + '/places/daily/' + dateString + '?' + query;
+      console.log(url);
+      request.get(url, function(err, request, body) {
+        if (err) {
+          return done(err);
+        }
+        if (request.statusCode === 403) {
+          return next(Error('Missing or Invalid Moves API Key'));
+        }
+        
+        return done(null, JSON.parse(body));
+      })
+    }
+  },
+  function(err, results) {
+    if (err) {
+      return next(err.message);
+    }
+
+    res.json(results);
+  });
 }
 
 /**
