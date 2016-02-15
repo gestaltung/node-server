@@ -27,6 +27,37 @@ exports.getLink = function(req, res) {
   }
 }
 
+exports.getUpdateLastfm = function(req, res) {
+  if (!req.user) {
+    return res.redirect('/login');
+  }
+  else {
+    return res.render('linkLastfm');
+  }
+}
+
+exports.postUpdateLastfm = function(req, res) {
+  if (!req.user) {
+    return res.redirect('/login');
+  }
+  else {
+    User.findById(req.user.id, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+      user.lastfm = req.body.username || '';
+
+      user.save(function(err) {
+        if (err) {
+          return next(err);
+        }
+        req.flash('success', { msg: 'Last.fm information updated.' });
+        res.redirect('/link');
+      });
+    });
+  }
+}
+
 /**
  * POST /login
  * Sign in using email and password.

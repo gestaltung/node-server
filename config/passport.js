@@ -214,6 +214,30 @@ passport.use(new MovesStrategy({
   }
 ));
 
+/**
+ * Last.fm API OAuth
+ */
+passport.use('lastfm', new OAuthStrategy({
+    requestTokenURL: 'http://www.last.fm/api/auth?api_key=' + process.env.LASTFM_KEY,
+    accessTokenURL: 'http://www.last.fm/api/auth/getSession',
+    userAuthorizationURL: 'http://www.last.fm/api/auth',
+    consumerKey: process.env.LASTFM_KEY,
+    consumerSecret: process.env.LASTFM_SECRET,
+    callbackURL: process.env.LASTFM_REDIRECT_URL,
+    passReqToCallback: true
+  },
+  function(req, accessToken, refreshToken, profile, done) {
+    User.findById(req.user.id, function(err, user) {
+      user.lastfm = profile.id;
+      user.token.push({ kind: 'lastfm', accessToken: accessToken });
+      user.save(function(err) {
+        req.flash('info', { msg: 'Lastfm account has been linked.' });
+        done(err, user);
+      });
+    });
+  }
+));
+
 
 /**
  * Foursquare API OAuth.

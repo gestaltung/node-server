@@ -114,7 +114,9 @@ app.get('/', homeController.index, passportConf.isAuthenticated);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
-app.get('/link', passportConf.isAuthenticated, userController.getLink)
+app.get('/link', passportConf.isAuthenticated, userController.getLink);
+app.get('/link/lastfm', passportConf.isAuthenticated, userController.getUpdateLastfm);
+app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdateLastfm);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
@@ -179,8 +181,14 @@ app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedire
   console.log(req);
  res.redirect('/');
 });
+
 app.get('/auth/moves', passport.authenticate('moves', {scope: ['default', 'activity', 'location']}));
 app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect: '/link' }), function(req, res) {
+ res.redirect('/');
+});
+
+app.get('/auth/lastfm', passport.authenticate('lastfm'));
+app.get('/auth/lastfm/callback', passport.authenticate('moves', { failureRedirect: '/link' }), function(req, res) {
  res.redirect('/');
 });
 
