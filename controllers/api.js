@@ -255,6 +255,7 @@ exports.getMovesProfile = function(req, res, next) {
 exports.getDailySummary = function(req, res, next) {
   // Last.fm and Moves for now
   // Yesterday is the day we have full data on so request previous day.
+  // To do: Pass date as a request parameter.
   request = require('request');
   LastFmNode = require('lastfm').LastFmNode;
   moment = require('moment');
@@ -270,17 +271,39 @@ exports.getDailySummary = function(req, res, next) {
   // Date stuff 
   var yesterday = moment().add(-1, 'days').startOf('day');
   var dateString = yesterday.format('YYYYMMDD');
+
+  // Moves info
+  var baseUrl = 'https://api.moves-app.com/api/1.1/user';
+  var query = querystring.stringify({
+    'access_token': token.accessToken,
+    'trackPoints': true
+  });
+
   
   async.parallel({
-    movesPlaces: function(done) {
+    // movesPlaces: function(done) {
+
+    //   var url = baseUrl + '/places/daily/' + dateString + '?' + query;
+    //   console.log(url);
+    //   request.get(url, function(err, request, body) {
+    //     if (err) {
+    //       return done(err);
+    //     }
+    //     if (request.statusCode === 403) {
+    //       return next(Error('Missing or Invalid Moves API Key'));
+    //     }
+        
+    //     return done(null, JSON.parse(body)[0]);
+    //   })
+    // },
+    movesStoryline: function(done) {
       var baseUrl = 'https://api.moves-app.com/api/1.1/user';
       var query = querystring.stringify({
         'access_token': token.accessToken,
         'trackPoints': true
       });
 
-      var url = baseUrl + '/places/daily/' + dateString + '?' + query;
-      console.log(url);
+      var url = baseUrl + '/storyline/daily/' + dateString + '?' + query;
       request.get(url, function(err, request, body) {
         if (err) {
           return done(err);
@@ -289,10 +312,47 @@ exports.getDailySummary = function(req, res, next) {
           return next(Error('Missing or Invalid Moves API Key'));
         }
         
-        return done(null, JSON.parse(body));
+        var data = JSON.parse(body)[0];
+        var output = {};
+        output.summary = data.summary;
+
+        var segments = [];
+        for (s in data.segments) {
+          var segment = data.segments[s];
+          var newSegment = {};
+          newSegment.startTime = segment.startTime;
+          newSegment.endTime = segment.endTime;
+
+          if (segment.type === "place") {
+            newSegment.type = "place";
+            newSegment.place = segment.place.name || "unknown";
+            newSegment.location = segment.place.location;
+          }
+          else {
+            newSegment.type = "move";
+            newSegment.activity = segment.activities[0].activity; // will only include name of 1st activity
+            var duration = 0;
+            var distance = 0;
+            var steps = 0;
+            var trackPoints = [];
+            for (a in segment.activities) {
+              trackPoints.push(segment.activities[a].trackPoints);
+              distance += segment.activities[a].distance;
+              duration += segment.activities[a].duration;
+              steps += segment.activities[a].steps;
+            }
+            newSegment.distance = distance;
+            newSegment.duration = duration;
+            newSegment.steps = steps;
+            newSegment.trackPoints = trackPoints;
+          }
+
+          segments.push(newSegment);
+        }
+
+        return done(null, segments);
       })
     },
-
     lastfmScrobbles: function(done) {
       lastfm.request('user.getRecentTracks', {
         user: lastfmUser,
