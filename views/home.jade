@@ -3,15 +3,13 @@ extends layout
 block content
   .row.text-center
     if user
-      h2 Dashboard 
-      h2 Link Apps
-      ul
-        li Fitbit
-        li Moves
-        li Last.fm
-        li Instagram
-        li Twitter
-      h2 Account
+      a(href="/dashboard")
+        h2 Dashboard 
+      a(href="/link")
+        h2 Link Apps
+      a(href="/account")
+        h2 Account
+
     else
       .col-sm-offset-3.col-sm-3
         a(href="/login")

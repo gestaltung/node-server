@@ -36,6 +36,7 @@ var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
+var dashboardController = require('./controllers/dashboard');
 
 /**
  * API keys and Passport configuration.
@@ -114,9 +115,10 @@ app.get('/', homeController.index, passportConf.isAuthenticated);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
-app.get('/link', passportConf.isAuthenticated, userController.getLink);
-app.get('/link/lastfm', passportConf.isAuthenticated, userController.getUpdateLastfm);
-app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdateLastfm);
+
+/**
+ * Account-related routes
+ */
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
@@ -125,12 +127,23 @@ app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
 app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
-app.get('/dashboard', passportConf.isAuthenticated)
 app.get('/account', passportConf.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
+
+/**
+ * Routes for linking accounts
+ */
+app.get('/link', passportConf.isAuthenticated, userController.getLink);
+app.get('/link/lastfm', passportConf.isAuthenticated, userController.getUpdateLastfm);
+app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdateLastfm);
+
+/**
+ * Dashboard routes
+ */
+app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashboard);
 
 /**
  * API examples routes.
