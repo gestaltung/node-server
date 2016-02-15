@@ -14,6 +14,7 @@ var ig;
 var Y;
 var fitbit;
 var request;
+var moment;
 
 var _ = require('lodash');
 var async = require('async');
@@ -255,19 +256,29 @@ exports.getDailySummary = function(req, res, next) {
   // Last.fm and Moves for now
   // Yesterday is the day we have full data on so request previous day.
   request = require('request');
+  LastFmNode = require('lastfm').LastFmNode;
+  moment = require('moment');
+
+  // Tokens and usernames
+  var lastfm = new LastFmNode({
+    api_key: process.env.LASTFM_KEY,
+    secret: process.env.LASTFM_SECRET
+  });
+  var lastfmUser = req.user.lastfm;
   var token = _.find(req.user.tokens, { kind: 'moves' });
   
-  var d = new Date();
-  var dateString = '' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + (d.getDate()-1)).slice(-2);
+  // Date stuff 
+  var yesterday = moment().add(-1, 'days').startOf('day');
+  var dateString = yesterday.format('YYYYMMDD');
   
-  var baseUrl = 'https://api.moves-app.com/api/1.1/user';
-  var query = querystring.stringify({
-    'access_token': token.accessToken,
-    'trackPoints': true
-  });
-
   async.parallel({
     movesPlaces: function(done) {
+      var baseUrl = 'https://api.moves-app.com/api/1.1/user';
+      var query = querystring.stringify({
+        'access_token': token.accessToken,
+        'trackPoints': true
+      });
+
       var url = baseUrl + '/places/daily/' + dateString + '?' + query;
       console.log(url);
       request.get(url, function(err, request, body) {
@@ -279,6 +290,35 @@ exports.getDailySummary = function(req, res, next) {
         }
         
         return done(null, JSON.parse(body));
+      })
+    },
+
+    lastfmScrobbles: function(done) {
+      lastfm.request('user.getRecentTracks', {
+        user: lastfmUser,
+        limit: 100,
+        from: yesterday.unix(),
+        to: yesterday.add(1, 'day').unix(),
+        handlers: {
+          success: function(data) {
+            var tracks = [];
+            data = data.recenttracks.track
+            for (t in data) {
+              tracks.push({
+                artist: data[t].artist["#text"],
+                name: data[t].name,
+                album: data[t].album["#text"],
+                image: data[t].image[2]["#text"] || null,
+                date: data[t].date.uts
+              })
+            }
+
+            done(null, tracks);
+          },
+          error: function(err) {
+            done(err);
+          }
+        }
       })
     }
   },
