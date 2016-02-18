@@ -37,16 +37,17 @@ angular.module('gestaltung.directives', [])
 	  				coordinates.minLon = _.minBy(scope.trackPoints, 'lon').lon;
 	  				
 	  				console.log(coordinates);
+	  				console.log(scope.places);
 	  				var width = 500;
 	  				var height = 500;
 
 	  				var latScale = d3.scale.linear()
 	  					.domain([coordinates.minLat, coordinates.maxLat])
-	  					.range([0, height])
+	  					.range([20, height-20])
 
 	  				var lonScale = d3.scale.linear()
 	  					.domain([coordinates.minLon, coordinates.maxLon])
-	  					.range([0, width])
+	  					.range([20, width-20])
 
 						var lineFunction = d3.svg.line()
 						 	.x(function(d) { return lonScale(d.lon); })
@@ -54,12 +55,28 @@ angular.module('gestaltung.directives', [])
 							.interpolate("linear");
 
 	  				var mapSvg = mapContainer.append('svg').attr('width', width).attr('height', height)
+	  				
 	  				mapSvg
 	  					.append("path")
 	  					.attr("d", lineFunction(scope.trackPoints))
 	  					.attr("stroke", "black")
 	  					.attr("stroke-width", 2)
 	  					.attr("fill", "none");
+
+	  				mapSvg
+	  					.selectAll("circle")
+	  						.data(scope.places)
+	  					.enter()
+	  					.append("circle")
+	  					.attr("r", 4)
+	  					.attr("fill", "red")
+	  					.attr("cx", function(d) {
+	  						console.log(d);
+	  						return lonScale(d.location.lon);
+	  					})
+	  					.attr("cy", function(d) {
+	  						return latScale(d.location.lat);
+	  					})
   				}
 
   				// var container = d3.select(elm[0]).append('p').text('fdsafdsa')

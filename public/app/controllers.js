@@ -31,14 +31,19 @@ angular.module('gestaltung.controllers', [])
 					console.log(data);
 					console.log(_.sum);
 					var trackPoints = [];
+					var places = [];
 					for (var m in data.movesStoryline) {
 						var move = data.movesStoryline[m];
 						if (move.type === "move") {
 							trackPoints.push(move.trackPoints);
 						}
+						else if (move.type === "place") {
+							places.push(move);
+						}
 					}
 					console.log('trackPoints', _.flatten(trackPoints));
 					$scope.trackPoints = _.flatten(trackPoints);
+					$scope.places = places;
 				}).
 				error(function (data, status, headers, config) {
 					$scope.name = 'Error!';
