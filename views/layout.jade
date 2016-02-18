@@ -5,9 +5,10 @@ html
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='csrf-token', content=_csrf)
+    base(href='/')
     title #{title}
     link(rel='stylesheet', href='/css/main.css')
-  body
+  body(ng-app="gestaltung")
     include partials/header
 
     .container
@@ -17,7 +18,16 @@ html
 
     script(src='/js/lib/jquery.min.js')
     script(src='/js/lib/bootstrap.min.js')
+    script(src='/bower_components/moment/moment.js')
+    script(src='/bower_components/d3/d3.js')
+    script(src='/bower_components/lodash/dist/lodash.js')
     script(src='/js/main.js')
+    script(src='/bower_components/angular/angular.js')
+    script(src='/bower_components/angular-route/angular-route.min.js')
+    script(src='/app/app.js')
+    script(src='/app/controllers.js')
+    script(src='/app/directives.js')
+    script(src='/app/services.js')
 
     // Google Analytics: change UA-XXXXX-X to be your site's ID
     script.

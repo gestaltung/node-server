@@ -2,3 +2,6 @@ extends layout
 
 block content
 	h1 Dashboard
+	div(ng-controller='DashboardCtrl')
+		h2 Artist {{name}}
+		div(app-version)

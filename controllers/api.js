@@ -259,6 +259,8 @@ exports.getDailySummary = function(req, res, next) {
   request = require('request');
   LastFmNode = require('lastfm').LastFmNode;
   moment = require('moment');
+  // console.log(req.user);
+  // console.log(req.user);
 
   // Tokens and usernames
   var lastfm = new LastFmNode({
@@ -334,9 +336,9 @@ exports.getDailySummary = function(req, res, next) {
             var duration = 0;
             var distance = 0;
             var steps = 0;
-            var trackPoints = [];
+            var trackPoints;
             for (a in segment.activities) {
-              trackPoints.push(segment.activities[a].trackPoints);
+              trackPoints = segment.activities[a].trackPoints;
               distance += segment.activities[a].distance;
               duration += segment.activities[a].duration;
               steps += segment.activities[a].steps;
@@ -369,13 +371,13 @@ exports.getDailySummary = function(req, res, next) {
                 name: data[t].name,
                 album: data[t].album["#text"],
                 image: data[t].image[2]["#text"] || null,
-                date: data[t].date.uts
+                date: data[t].date ? data[t].date.uts : null
               })
             }
-
-            done(null, tracks);
+            return done(null, tracks);
           },
           error: function(err) {
+            console.log(err);
             done(err);
           }
         }
@@ -408,7 +410,7 @@ exports.getRecentTracks = function(req, res, next) {
   async.parallel({
     topTracks: function(done) {
       lastfm.request('user.getRecentTracks', {
-        user: 'Zacoppotamus',
+        user: req.user.lastfm,
         handlers: {
           success: function(data) {
 
@@ -458,7 +460,7 @@ exports.getLastfm = function(req, res, next) {
 
   var userTopTracks = function(done) {
     lastfm.request('user.getWeeklyTrackChart', {
-      user: 'Zacoppotamus',
+      user: req.user.lastfm,
       handlers: {
         success: function(data) {
           var tracks = [];
