@@ -149,23 +149,20 @@ app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashb
  * API examples routes.
  */
 app.get('/api', apiController.getApi);
+app.get('/api/docs', apiController.getDocs);
 app.get('/api/fitbit', apiController.getFitbitProfile);
 app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
 app.get('/api/getDailySummary', apiController.getDailySummary);
-app.get('/api/lastfm', apiController.getLastfm);
-app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
-app.get('/api/nyt', apiController.getNewYorkTimes);
-app.get('/api/scraping', apiController.getScraping);
+// app.get('/api/lastfm', apiController.getLastfm);
+// app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
 // app.get('/api/twilio', apiController.getTwilio);
 // app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
 // app.get('/api/tumblr', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTumblr);
-app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
-app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
-app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
-// app.get('/api/paypal', apiController.getPayPal);
-// app.get('/api/paypal/success', apiController.getPayPalSuccess);
-// app.get('/api/paypal/cancel', apiController.getPayPalCancel);
+// app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
+// app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
+// app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
+
 
 /**
  * OAuth authentication routes. (Sign in)

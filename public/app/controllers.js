@@ -27,7 +27,8 @@ angular.module('gestaltung.controllers', [])
 					url: '/api/getDailySummary'
 				}).
 				success(function (data, status, headers, config) {
-					$scope.name = data.lastfmScrobbles[0].artist;
+					// $scope.name = data.lastfmScrobbles[0].artist;
+					$scope.name = null;
 					console.log(data);
 					console.log(_.sum);
 					var trackPoints = [];

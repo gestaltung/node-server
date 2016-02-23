@@ -21,6 +21,20 @@ var async = require('async');
 var querystring = require('querystring');
 
 /**
+ * GET /api/docs
+ * Lists documentation for API endpoints
+ */
+exports.getDocs = function(req, res) {
+  var data = [];
+  data.push({
+    'path': '/api/docs',
+    'description': 'This page',
+    'parameters': ['bla', 'bla', 'bla']
+  })
+  res.json(data);
+};
+
+/**
  * GET /api
  * List of API examples.
  */
@@ -74,113 +88,6 @@ exports.getFoursquare = function(req, res, next) {
   });
 };
 
-/**
- * GET /api/facebook
- * Facebook API example.
- */
-exports.getFacebook = function(req, res, next) {
-  graph = require('fbgraph');
-
-  var token = _.find(req.user.tokens, { kind: 'facebook' });
-  graph.setAccessToken(token.accessToken);
-  async.parallel({
-    getMe: function(done) {
-      graph.get(req.user.facebook + "?fields=id,name,email,first_name,last_name,gender,link,locale,timezone", function(err, me) {
-        done(err, me);
-      });
-    },
-    getMyFriends: function(done) {
-      graph.get(req.user.facebook + '/friends', function(err, friends) {
-        done(err, friends.data);
-      });
-    }
-  },
-  function(err, results) {
-    if (err) {
-      return next(err);
-    }
-    res.render('api/facebook', {
-      title: 'Facebook API',
-      me: results.getMe,
-      friends: results.getMyFriends
-    });
-  });
-};
-
-/**
- * GET /api/scraping
- * Web scraping example using Cheerio library.
- */
-exports.getScraping = function(req, res, next) {
-  cheerio = require('cheerio');
-  request = require('request');
-
-  request.get('https://news.ycombinator.com/', function(err, request, body) {
-    if (err) {
-      return next(err);
-    }
-    var $ = cheerio.load(body);
-    var links = [];
-    $('.title a[href^="http"], a[href^="https"]').each(function() {
-      links.push($(this));
-    });
-    res.render('api/scraping', {
-      title: 'Web Scraping',
-      links: links
-    });
-  });
-};
-
-/**
- * GET /api/github
- * GitHub API Example.
- */
-exports.getGithub = function(req, res, next) {
-  Github = require('github-api');
-
-  var token = _.find(req.user.tokens, { kind: 'github' });
-  var github = new Github({ token: token.accessToken });
-  var repo = github.getRepo('sahat', 'requirejs-library');
-  repo.show(function(err, repo) {
-    if (err) {
-      return next(err);
-    }
-    res.render('api/github', {
-      title: 'GitHub API',
-      repo: repo
-    });
-  });
-
-};
-
-
-/**
- * GET /api/nyt
- * New York Times API example.
- */
-exports.getNewYorkTimes = function(req, res, next) {
-  request = require('request');
-
-  var query = querystring.stringify({
-    'api-key': process.env.NYT_KEY,
-    'list-name': 'young-adult'
-  });
-  var url = 'http://api.nytimes.com/svc/books/v2/lists?' + query;
-
-  request.get(url, function(err, request, body) {
-    if (err) {
-      return next(err);
-    }
-    if (request.statusCode === 403) {
-      return next(Error('Missing or Invalid New York Times API Key'));
-    }
-    var bestsellers = JSON.parse(body);
-    res.render('api/nyt', {
-      title: 'New York Times API',
-      books: bestsellers.results
-    });
-  });
-};
 
 /**
  * GET /api/fitbit
@@ -250,17 +157,20 @@ exports.getMovesProfile = function(req, res, next) {
 
 /**
  * Daily Routines. Include merging all APIs and inserting into DB
+ * @param {date} date Day for summary. Format is YYYYMMDD.
  */
-
 exports.getDailySummary = function(req, res, next) {
-  // Last.fm and Moves for now
-  // Yesterday is the day we have full data on so request previous day.
-  // To do: Pass date as a request parameter.
+  // Last.fm and Moves for now.
+  // The last day will always be yesterday.
+  // 
+  // 
   request = require('request');
   LastFmNode = require('lastfm').LastFmNode;
   moment = require('moment');
   // console.log(req.user);
   // console.log(req.user);
+  console.log(req.query.date);
+  // return res.json(req.query);
 
   // Tokens and usernames
   var lastfm = new LastFmNode({
@@ -271,8 +181,19 @@ exports.getDailySummary = function(req, res, next) {
   var token = _.find(req.user.tokens, { kind: 'moves' });
   
   // Date stuff 
-  var yesterday = moment().add(-1, 'days').startOf('day');
-  var dateString = yesterday.format('YYYYMMDD');
+  var date;
+  if (req.query.date) {
+    date = moment(req.query.date, "YYYYMMDD").startOf('day');
+    console.log("date is", date);
+  }
+  else {
+    // Else get yesterday's date
+    // var yesterday = moment().add(-1, 'days').startOf('day');
+    date = moment().add(-1, 'days').startOf('day');
+
+  }
+
+  var dateString = date.format('YYYYMMDD');
 
   // Moves info
   var baseUrl = 'https://api.moves-app.com/api/1.1/user';
@@ -316,9 +237,16 @@ exports.getDailySummary = function(req, res, next) {
         
         var data = JSON.parse(body)[0];
         var output = {};
-        output.summary = data.summary;
-
         var segments = [];
+
+        try {
+          output.summary = data.summary;
+        }
+        catch(e) {
+          // TypeError, meaning no data for that date
+          return done(null, segments);
+        }
+
         for (s in data.segments) {
           var segment = data.segments[s];
           var newSegment = {};
@@ -359,8 +287,8 @@ exports.getDailySummary = function(req, res, next) {
       lastfm.request('user.getRecentTracks', {
         user: lastfmUser,
         limit: 100,
-        from: yesterday.unix(),
-        to: yesterday.add(1, 'day').unix(),
+        from: date.unix(),
+        to: date.add(1, 'day').unix(),
         handlers: {
           success: function(data) {
             var tracks = [];
@@ -598,35 +526,6 @@ exports.getTwitter = function(req, res, next) {
   });
 };
 
-/**
- * POST /api/twitter
- * Post a tweet.
- */
-exports.postTwitter = function(req, res, next) {
-  req.assert('tweet', 'Tweet cannot be empty.').notEmpty();
-
-  var errors = req.validationErrors();
-
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/api/twitter');
-  }
-
-  var token = _.find(req.user.tokens, { kind: 'twitter' });
-  var T = new Twit({
-    consumer_key: process.env.TWITTER_KEY,
-    consumer_secret: process.env.TWITTER_SECRET,
-    access_token: token.accessToken,
-    access_token_secret: token.tokenSecret
-  });
-  T.post('statuses/update', { status: req.body.tweet }, function(err, data, response) {
-    if (err) {
-      return next(err);
-    }
-    req.flash('success', { msg: 'Tweet has been posted.'});
-    res.redirect('/api/twitter');
-  });
-};
 
 /**
  * GET /api/twilio

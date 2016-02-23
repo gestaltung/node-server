@@ -46,7 +46,7 @@ angular.module('gestaltung.directives', [])
 	  					.range([20, height-20])
 
 	  				var lonScale = d3.scale.linear()
-	  					.domain([coordinates.minLon, coordinates.maxLon])
+	  					.domain([coordinates.maxLon, coordinates.minLon])
 	  					.range([20, width-20])
 
 						var lineFunction = d3.svg.line()
@@ -56,12 +56,25 @@ angular.module('gestaltung.directives', [])
 
 	  				var mapSvg = mapContainer.append('svg').attr('width', width).attr('height', height)
 	  				
-	  				mapSvg
+	  				var path = mapSvg
 	  					.append("path")
 	  					.attr("d", lineFunction(scope.trackPoints))
+	  					.transition()
+	  					.duration(2000)
 	  					.attr("stroke", "black")
 	  					.attr("stroke-width", 2)
 	  					.attr("fill", "none");
+
+	  				// Uncomment for path animation
+	  				// var totalLength = path.node().getTotalLength();
+
+				   //  path
+				   //    .attr("stroke-dasharray", totalLength + " " + totalLength)
+				   //    .attr("stroke-dashoffset", totalLength)
+				   //    .transition()
+				   //      .duration(2000)
+				   //      .ease("linear")
+				   //      .attr("stroke-dashoffset", 0);
 
 	  				mapSvg
 	  					.selectAll("circle")
