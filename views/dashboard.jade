@@ -1,7 +1,11 @@
 extends layout
 
 block content
-	h1 Dashboard
 	div(ng-controller='DashboardCtrl')
-		h2 Artist {{name}}
-		div(app-version)
+		// h2 Artist {{name}}
+		div(class="text-center")
+			a(class="fa fa-chevron-left" ng-click="removeDate()")
+			{{date.format('DD/MM/YYYY')}}&nbsp
+			a(class="fa fa-chevron-right" ng-click="addDate()")
+		div(user-dashboard)
+		// div(user-reflection)

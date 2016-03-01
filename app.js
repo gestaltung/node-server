@@ -181,7 +181,7 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
 });
 
 /**
- * OAuth authorization routes. (API examples)
+ * OAuth authorization routes.
  */
 app.get('/auth/fitbit', passport.authenticate('fitbit', {
   scope: ['activity', 'heartrate', 'location', 'profile'],

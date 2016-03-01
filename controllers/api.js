@@ -169,7 +169,7 @@ exports.getDailySummary = function(req, res, next) {
   moment = require('moment');
   // console.log(req.user);
   // console.log(req.user);
-  console.log(req.query.date);
+
   // return res.json(req.query);
 
   // Tokens and usernames
@@ -184,7 +184,6 @@ exports.getDailySummary = function(req, res, next) {
   var date;
   if (req.query.date) {
     date = moment(req.query.date, "YYYYMMDD").startOf('day');
-    console.log("date is", date);
   }
   else {
     // Else get yesterday's date
