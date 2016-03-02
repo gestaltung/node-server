@@ -35,6 +35,7 @@ dotenv.load({ path: '.env' });
 var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
+var thermalController = require('./controllers/thermal');
 var contactController = require('./controllers/contact');
 var dashboardController = require('./controllers/dashboard');
 
@@ -145,6 +146,7 @@ app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdate
  */
 app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashboard);
 
+
 /**
  * API examples routes.
  */
@@ -154,7 +156,7 @@ app.get('/api/fitbit', apiController.getFitbitProfile);
 app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
 app.get('/api/getDailySummary', apiController.getDailySummary);
 // app.get('/api/lastfm', apiController.getLastfm);
-// app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
+app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
 // app.get('/api/twilio', apiController.getTwilio);
 // app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
@@ -163,6 +165,11 @@ app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthoriz
 // app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
 // app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
 
+/**
+ * Thermal printer & Serial communications with Arduino
+ */
+app.get('/api/thermal', thermalController.printSummary);
+app.get('/api/blinkLED', thermalController.blinkLED);
 
 /**
  * OAuth authentication routes. (Sign in)

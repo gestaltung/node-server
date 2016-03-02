@@ -8,7 +8,7 @@ angular.module('gestaltung.controllers', [])
 		var timeFactor = 5; 
 		$scope.name = null;
 		$scope.trackPoints = null;
-		$scope.date = moment('20160222', 'YYYYMMDD');
+		$scope.date = moment().add(-1, 'day');
 		$scope.data = null;
 
 		// Specify whether we're animating a date range
@@ -18,7 +18,6 @@ angular.module('gestaltung.controllers', [])
 		$scope.currentDate = moment('20160213', 'YYYYMMDD');
 
 		var endDate = moment(moment().format('YYYYMMDD'));
-
 
 		if ($scope.range) {
 			var timeIdx = 0;
@@ -36,7 +35,7 @@ angular.module('gestaltung.controllers', [])
 			}
 		}
 		else {
-			getDailySummary($scope.currentDate);
+			getDailySummary($scope.date.format('YYYYMMDD'));
 		}
 
 		$scope.$watch($scope.date, function(newVal, oldVal) {
@@ -44,7 +43,7 @@ angular.module('gestaltung.controllers', [])
 				return;
 			}
 			alert('$scope.date changed');
-			getDailySummary($scope.date);
+			getDailySummary($scope.date.format('YYYYMMDD'));
 		})
 
 		$scope.addDate = function() {

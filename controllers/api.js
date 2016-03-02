@@ -193,6 +193,7 @@ exports.getDailySummary = function(req, res, next) {
   }
 
   var dateString = date.format('YYYYMMDD');
+  console.log('requested date', dateString);
 
   // Moves info
   var baseUrl = 'https://api.moves-app.com/api/1.1/user';
@@ -259,17 +260,24 @@ exports.getDailySummary = function(req, res, next) {
           }
           else {
             newSegment.type = "move";
-            newSegment.activity = segment.activities[0].activity; // will only include name of 1st activity
+            try {
+              newSegment.activity = segment.activities[0].activity; // will only include name of 1st activity
+            }
+            catch(e) {
+              // Default to walking (doesn't matter much now)
+              newSegment.activity = "walking";
+            }
             var duration = 0;
             var distance = 0;
             var steps = 0;
             var trackPoints;
-            for (a in segment.activities) {
-              trackPoints = segment.activities[a].trackPoints;
-              distance += segment.activities[a].distance;
-              duration += segment.activities[a].duration;
-              steps += segment.activities[a].steps;
-            }
+            _.each(segment.activities, function(seg) {
+              trackPoints = seg.trackPoints;
+              distance += seg.distance;
+              duration += seg.duration;
+              steps += seg.steps;  
+            })
+
             newSegment.distance = distance;
             newSegment.duration = duration;
             newSegment.steps = steps;
@@ -292,15 +300,25 @@ exports.getDailySummary = function(req, res, next) {
           success: function(data) {
             var tracks = [];
             data = data.recenttracks.track
-            for (t in data) {
+            // tracks = data;
+            _.each(data, function(track) {
               tracks.push({
-                artist: data[t].artist["#text"],
-                name: data[t].name,
-                album: data[t].album["#text"],
-                image: data[t].image[2]["#text"] || null,
-                date: data[t].date ? data[t].date.uts : null
+                artist: track.artist['#text'],
+                name: track.name,
+                album: track.album['#text'],
+                image: track.image[2]['#text'] || null,
+                date: track.date ? track.date.uts : null
               })
-            }
+            })
+            // for (t in data) {
+            //   tracks.push({
+            //     artist: data[t].artist["#text"] || null,
+            //     name: data[t].name,
+            //     album: data[t].album["#text"] || null,
+            //     image: data[t].image[2]["#text"] || null,
+            //     date: data[t].date ? data[t].date.uts : null
+            //   })
+            // }
             return done(null, tracks);
           },
           error: function(err) {

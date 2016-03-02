@@ -11,11 +11,6 @@ angular.module('gestaltung.directives', [])
 			// },
 			// template: 'Name: {{name}}',
 			link: function(scope, elm, attrs) {
-				// console.log(scope);
-				// var artistContainer = d3.select(elm[0])
-				// 	.append('div')
-				// 	.attr('id', 'artistContainer');
-
 				var mapContainer = d3.select(elm[0])
 					.append('div')
 					.attr('id', 'mapContainer');
@@ -26,6 +21,7 @@ angular.module('gestaltung.directives', [])
 					.attr('id', 'timelineContainer');
 
 				var mapSvg = mapContainer.append('svg').attr('width', 500).attr('height', 500);
+				var coordinates = {};
 				
 				scope.$watch("name", function(newValue, oldValue) {
 					// console.log('new val', newValue);
@@ -41,64 +37,74 @@ angular.module('gestaltung.directives', [])
 
 				scope.$watch("trackPoints", function(newValue, oldValue) {
 					if (scope.trackPoints) {
-
-						// Used to center the map
-						var coordinates = {};
-						coordinates.maxLat = _.maxBy(scope.trackPoints, 'lat').lat;
-						coordinates.minLat = _.minBy(scope.trackPoints, 'lat').lat;
-						coordinates.maxLon = _.maxBy(scope.trackPoints, 'lon').lon;
-						coordinates.minLon = _.minBy(scope.trackPoints, 'lon').lon;
-						
-						// console.log(coordinates);
-						// console.log(scope.places);
-						var width = 500;
-						var height = 500;
-
-						var latScale = d3.scale.linear()
-							.domain([coordinates.minLat, coordinates.maxLat])
-							.range([20, height-20])
-
-						var lonScale = d3.scale.linear()
-							.domain([coordinates.maxLon, coordinates.minLon])
-							.range([20, width-20])
-
-						var lineFunction = d3.svg.line()
-							.x(function(d) { return lonScale(d.lon); })
-							.y(function(d) { return latScale(d.lat); })
-							.interpolate("linear");
-
-						mapSvg.remove('path');
-						mapSvg = mapContainer.append('svg').attr('width', width).attr('height', height);
-						
-						var path = mapSvg
-							.append("path")
-							.attr("d", lineFunction(scope.trackPoints))
-							.transition()
-							.duration(2000)
-							.attr("stroke", "black")
-							.attr("stroke-width", 2)
-							.attr("fill", "none");
-
-						mapSvg.append("text")
-							.text(scope.date);
-
-						mapSvg
-							.selectAll("circle")
-								.data(scope.places)
-							.enter()
-							.append("circle")
-							.attr("r", 4)
-							.attr("fill", "red")
-							.attr("cx", function(d) {
-								console.log(d);
-								return lonScale(d.location.lon);
-							})
-							.attr("cy", function(d) {
-								return latScale(d.location.lat);
-							})
+						try {
+							// Used to center the map
+							coordinates.maxLat = _.maxBy(scope.trackPoints, 'lat').lat;
+							coordinates.minLat = _.minBy(scope.trackPoints, 'lat').lat;
+							coordinates.maxLon = _.maxBy(scope.trackPoints, 'lon').lon;
+							coordinates.minLon = _.minBy(scope.trackPoints, 'lon').lon;
+							mapSvg.remove('path');
+							mapSvg.remove('text');
+							drawMap();
+						}
+						catch(e) {
+							// No data
+							mapSvg.remove('path');
+							mapSvg.selectAll('text')
+								.data('No Data')
+								.enter()
+								.append('text');
+						}
+						console.log(scope.places);
 					}
+				});
 
-				})
+				var drawMap = function() {
+					var width = 500;
+					var height = 500;
+
+					var latScale = d3.scale.linear()
+						.domain([coordinates.minLat, coordinates.maxLat])
+						.range([20, height-20])
+
+					var lonScale = d3.scale.linear()
+						.domain([coordinates.maxLon, coordinates.minLon])
+						.range([20, width-20])
+
+					var lineFunction = d3.svg.line()
+						.x(function(d) { return lonScale(d.lon); })
+						.y(function(d) { return latScale(d.lat); })
+						.interpolate("linear");
+
+					mapSvg = mapContainer.append('svg').attr('width', width).attr('height', height);
+					
+					var path = mapSvg
+						.append("path")
+						.attr("d", lineFunction(scope.trackPoints))
+						.transition()
+						.duration(2000)
+						.attr("stroke", "black")
+						.attr("stroke-width", 2)
+						.attr("fill", "none");
+
+					mapSvg.append("text")
+						.text(scope.date);
+
+					mapSvg
+						.selectAll("circle")
+							.data(scope.places)
+						.enter()
+						.append("circle")
+						.attr("r", 4)
+						.attr("fill", "red")
+						.attr("cx", function(d) {
+							console.log(d);
+							return lonScale(d.location.lon);
+						})
+						.attr("cy", function(d) {
+							return latScale(d.location.lat);
+						})
+				}
 			}
 		}  
 	})
