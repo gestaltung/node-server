@@ -63,6 +63,22 @@ footer {
   }
 }
 
+#loginpage {
+  background: $brand-primary;
+  color: $white;
+  padding: 10%;
+
+  & .title h1 {
+    font-size: 70px;
+    font-family: 'Avant Garde';
+  } 
+
+  & p {
+    font-size: 40px;
+    font-family: 'Copernicus';
+  }
+}
+
 // Input Fields
 // -------------------------
 

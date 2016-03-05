@@ -5,8 +5,17 @@
 }
 
 a {
-	// text-decoration: underline;
 	color: $white;
+	transition: all .4s cubic-bezier(.24,.45,.46,.92);
+
+	&.underline {
+		text-decoration: underline;
+	}
+
+
+	&:hover {
+	  color: $black;
+	}
 }
 
 // Buttons
@@ -29,7 +38,7 @@ a {
 
 	&:hover {
 	  color: #fff;
-	  background-color: $gray-darker;
+	  background-color: $black;
 	}
 }
 
@@ -45,4 +54,20 @@ a {
 
 .btn-default, .btn-default:focus {
   // background-image: linear-gradient(to bottom, #ffffff 60%, #f8f8f8 100%);
+}
+
+// Forms
+// ---------------------
+.form-control {
+	background-color: $white;
+	font-family: 'Copernicus';
+	font-style: italic;
+	font-size: 16px;
+	height: 40px;
+	border-radius: 0px;
+
+	&:focus {
+		// border-color: 
+		border: 2px solid $gray;
+	}
 }
