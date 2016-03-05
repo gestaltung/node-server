@@ -11835,6 +11835,15 @@ footer p, footer ul {
 
 #loginpage {
   background: #9013fe;
+  /* Old browsers */
+  background: -moz-linear-gradient(-45deg, #9013fe 0%, #dc3d8e 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg, #9013fe 0%, #dc3d8e 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg, #9013fe 0%, #dc3d8e 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${p-color}', endColorstr='${s-color}',GradientType=1 );
+  /* IE6-9 fallback on horizontal gradient */
   color: white;
   padding: 10%;
 }
@@ -11842,10 +11851,11 @@ footer p, footer ul {
 #loginpage .title h1 {
   font-size: 70px;
   font-family: 'Avant Garde';
+  margin-bottom: 4%;
 }
 
 #loginpage p {
-  font-size: 40px;
+  font-size: 32px;
   font-family: 'Copernicus';
 }
 

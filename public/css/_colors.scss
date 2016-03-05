@@ -3,3 +3,11 @@ $brand-secondary: rgb(220,61,142);
 $white: rgb(255,255,255);
 $gray: rgb(80,80,80);
 $black: rgb(10,10,10);
+
+@mixin diagonal-gradient($p-color, $s-color) {
+	background: $p-color; /* Old browsers */
+	background: -moz-linear-gradient(-45deg, $p-color 0%, $s-color 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(-45deg, $p-color 0%,$s-color 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(135deg, $p-color 0%,$s-color 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='${p-color}', endColorstr='${s-color}',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}

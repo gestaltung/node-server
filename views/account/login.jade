@@ -1,26 +1,31 @@
 extends ../layout
 
 block content
+  include ../partials/header
   .row.full-bleed#loginpage
     .title
       h1 Log In
     form.form-horizontal(method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
       .form-group
-        .col-sm-4
+        .col-sm-8
           input.form-control(type='email', name='email', id='email', placeholder='Email', autofocus=true)
       .form-group
-        .col-sm-4
+        .col-sm-8
           input.form-control(type='password', name='password', id='password', placeholder='Password')
       .form-group
-        .col-sm-4
+        .col-sm-8
           button.col-sm-3.btn.btn-primary(type='submit')
-            | Login
+            | Log In
           a.col-sm-offset-1.btn(href='/forgot') Forgot your password?
       .form-group
-        .col-sm-4
+        .col-sm-7
           hr
     p Or, 
       a.underline(href='/auth/facebook')
         | log in with Facebook
+      |.
+    p
+      a.underline(href='/signup')
+        | Sign Up
       |.
