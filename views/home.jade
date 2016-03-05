@@ -1,18 +1,24 @@
 extends layout
 
 block content
+  if user
+    include partials/header
   .row.full-bleed#homepage
     .title
-      h1 Gestaltung
+      h1 Gestaltung.
     .copy
       p A framework for the physicalization of personal data.
     if user
-      a(href="/dashboard")
-        h2 Dashboard 
-      a(href="/link")
-        h2 Link Apps
-      a(href="/account")
-        h2 Account
+      .login-options.text-center
+        .col-sm-3
+          a.btn(href="/dashboard")
+            h2 Dashboard
+        .col-sm-3
+          a.btn(href="/link")
+            h2 Link Apps
+        .col-sm-3
+          a.btn(href="/account")
+            h2 Account
 
     else
       .login-options.text-center

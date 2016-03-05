@@ -26,13 +26,14 @@ a {
 	color: $brand-primary;
 	background-color: $white;
 	border-radius: 0px;
+	margin-bottom: 10px;
 	// border: 3px solid $black;
 
 	&:focus {
 	outline: none;
 	}
 
-	padding: 10px 16px;
+	padding: 8px 38px;
 	// border-radius: 3px;
 	transition: all .4s cubic-bezier(.24,.45,.46,.92);
 
@@ -54,6 +55,57 @@ a {
 
 .btn-default, .btn-default:focus {
   // background-image: linear-gradient(to bottom, #ffffff 60%, #f8f8f8 100%);
+}
+
+// Navbar
+// ---------------------
+.navbar {
+	padding: 20px 30px 0px 30px;
+	background-color: transparent;
+	font-family: 'Avant Garde';
+	font-size: 20px;
+	color: $black;
+	box-shadow: none;
+}
+
+.navbar-default {
+	& .navbar-brand {
+		color: $white;
+		font-size: 25px;
+
+		a {
+			color: $white;
+
+			&:hover {
+				color: $white;
+			}
+		}
+	}
+
+	& .navbar-toggle {
+		border-color: transparent;
+
+		& .icon-bar {
+			background-color: $white;
+		}
+	}
+
+	& .navbar-nav > li > a {
+		color: $white;
+	}
+
+}
+
+.navbar-header {
+	color: $white;
+	& a {
+		color: $white;
+	}
+}
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+	color: $black;
+	background-color: $white;
 }
 
 // Forms

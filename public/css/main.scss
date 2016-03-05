@@ -81,6 +81,18 @@ footer {
   }
 }
 
+#dashboard {
+  padding-top: 5%;
+  background: $brand-primary;
+  color: $white;
+  font-family: 'Avant Garde';
+
+  .nav-serif {
+    font-family: 'Copernicus';
+    font-style: italic;
+  }
+}
+
 // Input Fields
 // -------------------------
 

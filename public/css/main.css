@@ -11762,7 +11762,8 @@ a:hover {
   color: #9013fe;
   background-color: white;
   border-radius: 0px;
-  padding: 10px 16px;
+  margin-bottom: 10px;
+  padding: 8px 38px;
   transition: all 0.4s cubic-bezier(0.24, 0.45, 0.46, 0.92);
 }
 
@@ -11773,6 +11774,53 @@ a:hover {
 .btn:hover {
   color: #fff;
   background-color: #0a0a0a;
+}
+
+.navbar {
+  padding: 20px 30px 0px 30px;
+  background-color: transparent;
+  font-family: 'Avant Garde';
+  font-size: 20px;
+  color: #0a0a0a;
+  box-shadow: none;
+}
+
+.navbar-default .navbar-brand {
+  color: white;
+  font-size: 25px;
+}
+
+.navbar-default .navbar-brand a {
+  color: white;
+}
+
+.navbar-default .navbar-brand a:hover {
+  color: white;
+}
+
+.navbar-default .navbar-toggle {
+  border-color: transparent;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: white;
+}
+
+.navbar-default .navbar-nav > li > a {
+  color: white;
+}
+
+.navbar-header {
+  color: white;
+}
+
+.navbar-header a {
+  color: white;
+}
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  color: #0a0a0a;
+  background-color: white;
 }
 
 .form-control {
@@ -11857,6 +11905,18 @@ footer p, footer ul {
 #loginpage p {
   font-size: 32px;
   font-family: 'Copernicus';
+}
+
+#dashboard {
+  padding-top: 5%;
+  background: #9013fe;
+  color: white;
+  font-family: 'Avant Garde';
+}
+
+#dashboard .nav-serif {
+  font-family: 'Copernicus';
+  font-style: italic;
 }
 
 textarea {

@@ -1,11 +1,13 @@
 extends layout
 
 block content
-	div(ng-controller='DashboardCtrl')
-		// h2 Artist {{name}}
-		div(class="text-center")
-			a(class="fa fa-chevron-left" ng-click="removeDate()")
-			{{date.format('DD/MM/YYYY')}}&nbsp
-			a(class="fa fa-chevron-right" ng-click="addDate()")
-		div(user-dashboard)
-		// div(user-reflection)
+	.row.full-bleed#dashboard
+		include partials/header
+		div(ng-controller='DashboardCtrl')
+			// h2 Artist {{name}}
+			div(class="text-center")
+				a(class="fa fa-chevron-left" ng-click="removeDate()")
+				{{date.format('DD/MM/YYYY')}}&nbsp
+				a(class="fa fa-chevron-right" ng-click="addDate()")
+			div(user-dashboard)
+			// div(user-reflection)
