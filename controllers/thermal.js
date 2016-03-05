@@ -27,11 +27,13 @@ exports.printSummary = function(req, res) {
 	            .right()
 	            .printLine('second line')
 	            .print(function() {
-	                console.log('done');
-	                process.exit();
+                console.log('done');
+                process.exit();
 	            });
 	    });
 	});
+
+	res.json({'status': 'done'});
 }
 
 // Make sure Arduino interface is working

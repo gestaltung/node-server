@@ -1,7 +1,11 @@
 extends layout
 
 block content
-  .row.text-center
+  .row.full-bleed#homepage
+    .title
+      h1 Gestaltung
+    .copy
+      p A framework for the physicalization of personal data.
     if user
       a(href="/dashboard")
         h2 Dashboard 
@@ -11,9 +15,10 @@ block content
         h2 Account
 
     else
-      .col-sm-offset-3.col-sm-3
-        a(href="/login")
-          h1 Log In 
-      .col-sm-3
-        a(href="/signup")
-          h1 Sign Up 
+      .login-options.text-center
+        .col-sm-offset-3.col-sm-3
+          a.btn(href="/login")
+            h2 Log In 
+        .col-sm-3
+          a.btn(href="/signup")
+            h2 Sign Up 

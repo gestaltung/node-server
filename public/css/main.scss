@@ -1,10 +1,13 @@
-@import "themes/modern/variables";
+// @import "themes/modern/variables";
 
 @import "vendors/bootstrap/bootstrap";
 @import "vendors/bootstrap-social";
 @import "vendors/font-awesome/font-awesome";
 
 @import "themes/modern/modern";
+@import "fonts";
+@import "colors";
+@import "overrides";
 
 // Scaffolding
 // -------------------------
@@ -15,8 +18,8 @@ html {
 }
 
 body {
-  padding-top: 60px;
-  margin-bottom: 75px;
+  // padding-top: 60px;
+  // margin-bottom: 75px;
 }
 
 footer {
@@ -28,6 +31,35 @@ footer {
 
   p, ul {
     margin-bottom: 0;
+  }
+}
+
+// Containers
+.full-bleed{
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  background-size: cover;
+  overflow: hidden;
+}
+
+#homepage {
+  background: $brand-primary;
+  color: $white;
+  padding: 10%;
+
+  & .title h1 {
+    font-size: 100px;
+    font-family: 'Avant Garde';
+  }
+
+  & .copy p {
+    font-size: 50px;
+    font-family: 'Copernicus';
+  }
+
+  & .login-options {
+    margin-top: 5%;
   }
 }
 
