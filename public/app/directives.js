@@ -82,8 +82,8 @@ angular.module('gestaltung.directives', [])
 						.append("path")
 						.attr("d", lineFunction(scope.trackPoints))
 						.transition()
-						.duration(2000)
-						.attr("stroke", "black")
+						.duration(500)
+						.attr("stroke", "white")
 						.attr("stroke-width", 2)
 						.attr("fill", "none");
 
@@ -95,6 +95,8 @@ angular.module('gestaltung.directives', [])
 							.data(scope.places)
 						.enter()
 						.append("circle")
+						.transition()
+						.duration(2000)
 						.attr("r", 4)
 						.attr("fill", "red")
 						.attr("cx", function(d) {
@@ -107,6 +109,75 @@ angular.module('gestaltung.directives', [])
 				}
 			}
 		}  
+	})
+	.directive('artistCloud', function() {
+		return {
+			link: function(scope, elm, attrs) {
+				var artistContainer = d3.select(elm[0])
+					.append('div')
+					.attr('id', 'artistContainer');
+
+				scope.$watch("data", function(newValue, oldValue) {
+					if (newValue == oldValue) {
+						// Initializing
+						return;
+					}
+
+
+					var artists = _.uniqBy(scope.data.lastfmScrobbles, 'artist');
+					console.log('artists', artists);
+
+					d3.select('#artistContainer').selectAll("*").remove();
+					artistContainer.selectAll('p')
+						.data(artists, function(d) {
+							// console.log(d)
+							return d.artist;
+						})
+						.enter()
+						.append('p')
+						.text(function(d) {
+							console.log(d);
+							return d.artist;
+						})
+					
+				})
+			}
+		}
+	})
+	.directive('placesSummary', function() {
+		return {
+			link: function(scope, elm, attr) {
+				var placesContainer = d3.select(elm[0])
+					.append('div')
+					.attr('id', 'placesContainer');
+
+				scope.$watch('data', function(newValue, oldValue) {
+					if (newValue == oldValue) {
+						return;
+					}
+					var places = _.filter(scope.data.movesStoryline, function(d) {
+						if (d.type === 'place') {
+							return d.place !== 'unknown'
+						}
+						return false;
+					})
+
+
+					places = _.uniqBy(places, 'place');
+					console.log('places', places);
+
+					d3.select('#placesContainer').selectAll("*").remove();
+					placesContainer.selectAll('p')
+						.data(places)
+						.enter()
+						.append('p')
+						.text(function(d) {
+							console.log(d);
+							return d.place;
+						})
+				})
+			}
+		}
 	})
 	.directive('userReflection', function() {
 		return {
