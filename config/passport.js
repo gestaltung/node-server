@@ -174,7 +174,7 @@ passport.use(new TwitterStrategy({
  */
 passport.use(new FitbitStrategy({
     clientID: process.env.FITBIT_CLIENT_ID,
-    clientSecret: process.env.FITBIT_SECRET,
+    clientSecret: process.env.FITBIT_CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/fitbit/callback",
     passReqToCallback: true
   },
@@ -183,7 +183,7 @@ passport.use(new FitbitStrategy({
     // TO DO: Check it there's already a token and if there is, update it
     User.findById(req.user.id, function(err, user) {
       user.fitbit = profile.id;
-      user.tokens.push({ kind: 'fitbit', accessToken: accessToken });
+      user.tokens.push({ kind: 'fitbit', accessToken: accessToken, refreshToken: refreshToken });
       user.save(function(err) {
         req.flash('info', { msg: 'Fitbit account has been linked.' });
         done(err, user);

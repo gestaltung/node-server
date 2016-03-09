@@ -95,27 +95,54 @@ exports.getFoursquare = function(req, res, next) {
 exports.getFitbitProfile = function(req, res, next) {
   fitbit = require("fitbit-node");
   var token = _.find(req.user.tokens, { kind: 'fitbit' });
-  console.log("token", token);
-  // var token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTUyOTYzNTIsInNjb3BlcyI6InJwcm8gcmhyIHJsb2MgcmFjdCIsInN1YiI6IjQ5Q05HWSIsImF1ZCI6IjIyN0dISCIsImlzcyI6IkZpdGJpdCIsInR5cCI6ImFjY2Vzc190b2tlbiIsImlhdCI6MTQ1NTI5Mjc1Mn0.FF-rQoVS7x_FdRXKrxx35A54N7E4K2OpzhhQdmhHW_0";
-  var client = new fitbit(process.env.FITBIT_CLIENT_ID, process.env.FITBIT_SECRET);
+  // console.log("token", token);
 
-  async.parallel({
-    getProfile: function(done) {
-      client.get("/profile.json", token.accessToken).then(function(err, results) {
-        console.log(err);
-        done(err, results)
-      })
-    }
-  },
-  function(err, results) {
-    if (err) {
-      return next(err);
-    }
-    res.render('api/fitbit', {
-      title: 'Fitbit API',
-      data: results.getProfile
-    });
+  // var client = new fitbit(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CLIENT_SECRET);
+      
+  // client.get("/profile.json", token.accessToken).then(function(err, results) {
+  //   // console.log(err);
+  //   res.send(results[0]);
+  // }).catch(function(error) {
+  //   res.send(error);
+  // });
+
+  request = require('request');
+  var query = querystring.stringify({
+    'access_token': token.accessToken
   });
+
+  var options = {
+    url: 'https://api.fitbit.com/1/user/49CNGY/activities/date/2016-03-05.json?' + query,
+    headers: {
+      'Authorization': 'Basic ' + token.accessToken,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  }
+
+  request.get(options, function(err, request, body) {
+    if (err) {
+      res.send(err);
+    }
+    // console.log(body);
+    res.json(JSON.parse(body));
+    // res.json(JSON.parse(body));
+  })
+
+//   async.parallel({
+//     getProfile: function(done) {
+//     }
+//   },
+//   function(err, results) {
+//     if (err) {
+//       // return next(err);
+//       res.json(Error('missing or invalid fitbit key'));
+//     }
+//     // res.render('api/fitbit', {
+//     //   title: 'Fitbit API',
+//     //   data: results.getProfile
+//     // });
+//     res.json(results);
+//   });
 }
 
 /**

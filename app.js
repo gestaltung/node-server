@@ -59,6 +59,31 @@ mongoose.connection.on('error', function() {
 });
 
 /**
+ * Setup thermal printer
+ */
+var Printer = require('thermalprinter');
+var serialPort = require("serialport");
+var SerialPort = serialPort.SerialPort;
+
+serialPort.list(function (err, ports) {
+  ports.forEach(function(port) {
+    // if our device is connected, open serial port communication.
+    if (port.comName === process.envSERIALPORT) {
+      exports.serialPort = new SerialPort(process.env.SERIALPORT, {
+         baudrate: process.env.BAUDRATE
+      });
+      
+      exports.printer = new Printer(exports.serialPort);
+    }
+    else {
+      console.log('no thermal printer connected');
+    }
+  });
+});
+   
+
+
+/**
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
@@ -92,7 +117,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use(lusca({
-  csrf: true,
+  // csrf: true,
+  csrf: false,
   xframe: 'SAMEORIGIN',
   xssProtection: true
 }));
@@ -168,7 +194,7 @@ app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthoriz
 /**
  * Thermal printer & Serial communications with Arduino
  */
-app.get('/api/thermal', thermalController.printSummary);
+app.post('/api/thermal', thermalController.printSummary);
 app.get('/api/blinkLED', thermalController.blinkLED);
 
 /**
@@ -191,12 +217,12 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
  * OAuth authorization routes.
  */
 app.get('/auth/fitbit', passport.authenticate('fitbit', {
-  scope: ['activity', 'heartrate', 'location', 'profile'],
-  session: true
+  scope: ['activity', 'heartrate', 'location', 'profile']
+  // session: true
 }));
 app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/link' }), function(req, res) {
   console.log(req);
- res.redirect('/');
+  res.redirect('/');
 });
 
 app.get('/auth/moves', passport.authenticate('moves', {scope: ['default', 'activity', 'location']}));
@@ -206,7 +232,7 @@ app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect
 
 app.get('/auth/lastfm', passport.authenticate('lastfm'));
 app.get('/auth/lastfm/callback', passport.authenticate('moves', { failureRedirect: '/link' }), function(req, res) {
- res.redirect('/');
+  res.redirect('/');
 });
 
 app.get('/auth/foursquare', passport.authorize('foursquare'));

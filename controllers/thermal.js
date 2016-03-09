@@ -1,39 +1,33 @@
-var SerialPort = require("serialport").SerialPort
-// var serialPort = new SerialPort("/dev/tty-usbserial1", {
-//   baudrate: 57600
-// });
+var Printer = require('thermalprinter');
+var app = require('../app');
 var five = require("johnny-five");
 
 
 exports.printSummary = function(req, res) {
-	var SerialPort = require('serialport').SerialPort,
-	    serialPort = new SerialPort('/dev/cu.usbmodemFA131', {
-	        baudrate: 19200
-	    }),
-	    Printer = require('thermalprinter');
+	// don't use app.serialPort.on('open')
+	// or app.printer.on('ready')
+	// make sure process.exit() from the example is deleted.
+	console.log(req.body);
 
-	serialPort.on('open',function() {
-	    var printer = new Printer(serialPort);
-	    printer.on('ready', function() {
-	        printer
-	            .indent(10)
-	            .horizontalLine(16)
-	            .bold(true)
-	            .indent(10)
-	            .printLine('first line')
-	            .bold(false)
-	            .inverse(true)
-	            .big(true)
-	            .right()
-	            .printLine('second line')
-	            .print(function() {
+	if (!app.serialPort) {
+		res.json({'status': 'no printer connected'});
+		return;
+	}
+
+	if (app.serialPort.isOpen()) {
+        app.printer
+            .bold(true)
+            .indent(0)
+            .left()
+            .printLine(req.body.name)
+            .print(function() {
                 console.log('done');
-                process.exit();
-	            });
-	    });
-	});
-
-	res.json({'status': 'done'});
+				res.json({'status': 'done'});
+            });
+	}
+	else {
+		res.json({'status': 'fail'});
+	}
 }
 
 // Make sure Arduino interface is working

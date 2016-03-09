@@ -6,10 +6,13 @@ block content
 			include partials/header
 		div(ng-controller='DashboardCtrl')
 			.row
-				div.col-sm-12.date-picker(class="text-center")
+				div.col-sm-8.date-picker(class="text-center")
 					a(class="fa fa-chevron-left" ng-click="removeDate()")
 					{{date.format('DD/MM/YYYY')}}&nbsp
 					a(class="fa fa-chevron-right" ng-click="addDate()")
+				div.col-sm-4
+					a.btn(ng-click="printSummary()")
+						h5 Print Summary
 			.row
 				div.col-sm-8(user-dashboard)
 				div.col-sm-2(artist-cloud)

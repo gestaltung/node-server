@@ -56,42 +56,65 @@ angular.module('gestaltung.controllers', [])
 			getDailySummary($scope.date.format('YYYYMMDD'));
 		}
 
-		function getDailySummary(date) {
+		$scope.printSummary = function() {
+			// TO DO: Make preprocessing of places, trackpoints more modular.
+			var places = _.filter($scope.data.movesStoryline, function(d) {
+				if (d.type === 'place') {
+					return d.place !== 'unknown'
+				}
+				return false;
+			})
+
+			places = _.uniqBy(places, 'place');
+
 			$http({
-						method: 'GET',
-						url: '/api/getDailySummary',
-						params: {
-							'date': date
-						}
-					})
-					.success(function (data, status, headers, config) {
-						try {
-							$scope.name = data.lastfmScrobbles[0].artist;
-						}
-						catch(e) {
-							$scope.name = null;
-						}
+				method: 'POST',
+				url: '/api/thermal',
+				headers : { 'Content-Type': 'application/json' },
+				data: {
+					'date': $scope.date.format('DD/MM/YYYY'),
+					'places': places
+				}
+			})
+		}
 
-						var trackPoints = [];
-						var places = [];
-						for (var m in data.movesStoryline) {
-							var move = data.movesStoryline[m];
-							if (move.type === "move") {
-								trackPoints.push(move.trackPoints);
-							}
-							else if (move.type === "place") {
-								places.push(move);
-							}
-						}
+		function getDailySummary(date) {
+			console.log('date', date);
+			$http({
+				method: 'GET',
+				url: '/api/getDailySummary',
+				params: {
+					'date': date
+				}
+			})
+			.success(function (data, status, headers, config) {
+				try {
+					$scope.name = data.lastfmScrobbles[0].artist;
+				}
+				catch(e) {
+					$scope.name = null;
+				}
 
-						$scope.trackPoints = _.flatten(trackPoints);
-						$scope.places = places;
-						// $scope.date = date.format("DD/MM/YYYY");
-						$scope.data = data;
-					})
-					.error(function (data, status, headers, config) {
-						$scope.name = 'Error!';
-					});
+				var trackPoints = [];
+				var places = [];
+				for (var m in data.movesStoryline) {
+					var move = data.movesStoryline[m];
+					if (move.type === "move") {
+						trackPoints.push(move.trackPoints);
+					}
+					else if (move.type === "place") {
+						places.push(move);
+					}
+				}
+
+				$scope.trackPoints = _.flatten(trackPoints);
+				$scope.places = places;
+				// $scope.date = date.format("DD/MM/YYYY");
+				$scope.data = data;
+			})
+			.error(function (data, status, headers, config) {
+				$scope.name = 'Error!';
+			});
 
 			// for (var idx = 0; idx<5; idx++) {
 			// 	var a = idx+1;

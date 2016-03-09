@@ -55,7 +55,6 @@ angular.module('gestaltung.directives', [])
 								.enter()
 								.append('text');
 						}
-						console.log(scope.places);
 					}
 				});
 
@@ -64,7 +63,7 @@ angular.module('gestaltung.directives', [])
 					var height = 500;
 
 					var latScale = d3.scale.linear()
-						.domain([coordinates.minLat, coordinates.maxLat])
+						.domain([coordinates.maxLat, coordinates.minLat])
 						.range([20, height-20])
 
 					var lonScale = d3.scale.linear()
@@ -100,7 +99,6 @@ angular.module('gestaltung.directives', [])
 						.attr("r", 4)
 						.attr("fill", "red")
 						.attr("cx", function(d) {
-							console.log(d);
 							return lonScale(d.location.lon);
 						})
 						.attr("cy", function(d) {
@@ -125,18 +123,15 @@ angular.module('gestaltung.directives', [])
 
 
 					var artists = _.uniqBy(scope.data.lastfmScrobbles, 'artist');
-					console.log('artists', artists);
 
 					d3.select('#artistContainer').selectAll("*").remove();
 					artistContainer.selectAll('p')
 						.data(artists, function(d) {
-							// console.log(d)
 							return d.artist;
 						})
 						.enter()
 						.append('p')
 						.text(function(d) {
-							console.log(d);
 							return d.artist;
 						})
 					
@@ -161,7 +156,7 @@ angular.module('gestaltung.directives', [])
 						}
 						return false;
 					})
-
+					console.log('scope.places', scope.places);
 
 					places = _.uniqBy(places, 'place');
 					console.log('places', places);
@@ -172,7 +167,6 @@ angular.module('gestaltung.directives', [])
 						.enter()
 						.append('p')
 						.text(function(d) {
-							console.log(d);
 							return d.place;
 						})
 				})
