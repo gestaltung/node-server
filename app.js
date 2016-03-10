@@ -217,7 +217,7 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
  * OAuth authorization routes.
  */
 app.get('/auth/fitbit', passport.authenticate('fitbit', {
-  scope: ['activity', 'heartrate', 'location', 'profile']
+  scope: ['activity', 'heartrate', 'location', 'profile', 'sleep']
   // session: true
 }));
 app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/link' }), function(req, res) {

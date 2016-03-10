@@ -95,6 +95,7 @@ exports.getFoursquare = function(req, res, next) {
 exports.getFitbitProfile = function(req, res, next) {
   fitbit = require("fitbit-node");
   var token = _.find(req.user.tokens, { kind: 'fitbit' });
+  var userID = req.user.fitbit;
   // console.log("token", token);
 
   // var client = new fitbit(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CLIENT_SECRET);
@@ -112,9 +113,9 @@ exports.getFitbitProfile = function(req, res, next) {
   });
 
   var options = {
-    url: 'https://api.fitbit.com/1/user/49CNGY/activities/date/2016-03-05.json?' + query,
+    url: 'https://api.fitbit.com/1/user/'+userID+'/sleep/date/2016-03-10.json?' + query,
     headers: {
-      'Authorization': 'Basic ' + token.accessToken,
+      'Authorization': 'Bearer ' + token.accessToken,
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   }
