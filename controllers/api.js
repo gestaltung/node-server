@@ -94,20 +94,11 @@ exports.getFoursquare = function(req, res, next) {
  */
 exports.getFitbitProfile = function(req, res, next) {
   fitbit = require("fitbit-node");
+  request = require('request');
+
   var token = _.find(req.user.tokens, { kind: 'fitbit' });
   var userID = req.user.fitbit;
-  // console.log("token", token);
 
-  // var client = new fitbit(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CLIENT_SECRET);
-      
-  // client.get("/profile.json", token.accessToken).then(function(err, results) {
-  //   // console.log(err);
-  //   res.send(results[0]);
-  // }).catch(function(error) {
-  //   res.send(error);
-  // });
-
-  request = require('request');
   var query = querystring.stringify({
     'access_token': token.accessToken
   });
@@ -124,26 +115,49 @@ exports.getFitbitProfile = function(req, res, next) {
     if (err) {
       res.send(err);
     }
-    // console.log(body);
-    res.json(JSON.parse(body));
-    // res.json(JSON.parse(body));
-  })
 
-//   async.parallel({
-//     getProfile: function(done) {
-//     }
-//   },
-//   function(err, results) {
-//     if (err) {
-//       // return next(err);
-//       res.json(Error('missing or invalid fitbit key'));
-//     }
-//     // res.render('api/fitbit', {
-//     //   title: 'Fitbit API',
-//     //   data: results.getProfile
-//     // });
-//     res.json(results);
-//   });
+    res.json(JSON.parse(body));
+  })
+}
+
+/**
+ * GET /api/fitbit/refresh
+ */
+exports.getFitbitRefreshToken = function(req, res, next) {
+  request = require('request');
+  var token = _.find(req.user.tokens, { kind: 'fitbit' });
+  var userID = req.user.fitbit;
+
+
+  var query = querystring.stringify({
+    'grant_type': 'refresh_token',
+    'refresh_token': token.refreshToken
+    // 'scope': 'activity heartrate location profile sleep'
+  });
+  console.log(query);
+
+  // convert client id / secret to base 64
+  var encodedString = new Buffer(process.env.FITBIT_CLIENT_ID+':'+process.env.FITBIT_CLIENT_SECRET).toString('base64');
+
+  var options = {
+    url: 'https://api.fitbit.com/oauth2/token?' + query,
+    headers: {
+      'Authorization': 'Basic ' + encodedString,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  }
+
+  request.post(options, function(err, request, body) {
+    if (err) {
+      res.send(err);
+    }
+
+    var response = JSON.parse(body);
+    token.accessToken = response.access_token;
+    token.refreshToken = response.refresh_token;
+
+    res.json(JSON.parse(body));
+  })
 }
 
 /**

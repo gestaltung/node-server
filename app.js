@@ -178,6 +178,7 @@ app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashb
  */
 app.get('/api', apiController.getApi);
 app.get('/api/docs', apiController.getDocs);
+app.get('/api/fitbit/refresh', apiController.getFitbitRefreshToken);
 app.get('/api/fitbit', apiController.getFitbitProfile);
 app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
 app.get('/api/getDailySummary', apiController.getDailySummary);
@@ -221,7 +222,6 @@ app.get('/auth/fitbit', passport.authenticate('fitbit', {
   // session: true
 }));
 app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/link' }), function(req, res) {
-  console.log(req);
   res.redirect('/');
 });
 
