@@ -181,15 +181,16 @@ passport.use(new FitbitStrategy({
   function(req, accessToken, refreshToken, profile, done) {
     // User is alredy logged in, so we're just linking Fitbit account
     
-    // Check it there's already a token and if there is, update it
-    var token = _.find(req.user.tokens, { kind: 'fitbit' });
 
     User.findById(req.user.id, function(err, user) {
+      // Check it there's already a token and if there is, update it
+      var tokenIndex = _.findIndex(user.tokens, { kind: 'fitbit' });
       user.fitbit = profile.id;
-      if (token) {
+
+      if (tokenIndex != -1) {
         console.log('token already exists')
-        token.accessToken = accessToken;
-        token.refreshToken = refreshToken;
+        user.tokens[tokenIndex].accessToken = accessToken;
+        user.tokens[tokenIndex].refreshToken = refreshToken;
       }
       else {
         user.tokens.push({ kind: 'fitbit', accessToken: accessToken, refreshToken: refreshToken });

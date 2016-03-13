@@ -35,6 +35,8 @@ dotenv.load({ path: '.env' });
 var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
+var authenticationController = require('./controllers/authentication');
+var fitbitController = require('./controllers/fitbit');
 var thermalController = require('./controllers/thermal');
 var contactController = require('./controllers/contact');
 var dashboardController = require('./controllers/dashboard');
@@ -81,7 +83,6 @@ serialPort.list(function (err, ports) {
   });
 });
    
-
 
 /**
  * Express configuration.
@@ -172,14 +173,16 @@ app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdate
  */
 app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashboard);
 
+/**
+ * Authentication for other devices
+ */
+app.get('/api/authenticate', authenticationController.getTokens);
 
 /**
  * API examples routes.
  */
 app.get('/api', apiController.getApi);
 app.get('/api/docs', apiController.getDocs);
-app.get('/api/fitbit/refresh', apiController.getFitbitRefreshToken);
-app.get('/api/fitbit', apiController.getFitbitProfile);
 app.get('/api/moves', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getMovesProfile);
 app.get('/api/getDailySummary', apiController.getDailySummary);
 // app.get('/api/lastfm', apiController.getLastfm);
@@ -191,6 +194,15 @@ app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthoriz
 // app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
 // app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
 // app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
+
+/**
+ * Fitbit Routes.
+ */
+app.get('/api/fitbit/sleep', fitbitController.getSleepSummary);
+app.get('/api/fitbit/activity', fitbitController.getActivitySummary);
+app.get('/api/fitbit/refresh', fitbitController.getFitbitRefreshToken);
+app.get('/api/fitbit', fitbitController.getFitbitProfile);
+
 
 /**
  * Thermal printer & Serial communications with Arduino
