@@ -89,34 +89,6 @@ exports.getFoursquare = function(req, res, next) {
 };
 
 /**
- * GET /api/moves
- */
-exports.getMovesProfile = function(req, res, next) {
-  request = require('request');
-  var token = _.find(req.user.tokens, { kind: 'moves' });
-
-  var query = querystring.stringify({
-    'access_token': token.accessToken,
-    'trackPoints': true
-  });
-  var url = 'https://api.moves-app.com/api/1.1/user/places/daily/20160213?' + query;
-
-  request.get(url, function(err, request, body) {
-    if (err) {
-      return next(err);
-    }
-    if (request.statusCode === 403) {
-      return next(Error('Missing or Invalid Moves API Key'));
-    }
-    // console.log(JSON.parse(body));
-    res.json(JSON.parse(body));
-    // res.render('api/moves', {
-    //   data: JSON.parse(body)
-    // })
-  })
-}
-
-/**
  * CRON Jobs will be defined here
  * This function will periodically merge all data produced by users
  * in their linked apps.
