@@ -12,13 +12,23 @@ var querystring = require('querystring');
  * @param {date} [date] [in YYYYMMDD format]
  * 
  * Returns distance in km and duration in mins.
+ *
+ * TO DO: Server crashes when wrong access token is provided
  */
 exports.getAggregatedDistance = function(req, res) {
 	request = require('request');
 	var baseUrl = 'https://api.moves-app.com/api/1.1/user';
+	var token, userID;
 
-	var token = _.find(req.user.tokens, { kind: 'moves' });
-	var userID = req.user.moves;
+	// OpenFrameworks won't have tokens in request.
+	try {
+		token = _.find(req.user.tokens, { kind: 'moves' });
+		userID = req.user.moves;
+	}
+	catch(err) {
+
+	}
+
 
 	// Date stuff 
 	var date;
@@ -32,22 +42,25 @@ exports.getAggregatedDistance = function(req, res) {
 	var dateString = date.format('YYYYMMDD');
 
 	var query = querystring.stringify({
-	  'access_token': token.accessToken
+	  'access_token': req.query.access_token || token.accessToken
 	});
 
 	var url = baseUrl + '/activities/daily/' + dateString + '?' + query;
 	request.get(url, function(err, request, body) {
 		if (err) {
-			return res.send(err);
+			res.send(err);
+			return;
 		}
 
-		if (req.statusCode === 403) {
-			return res.send('Missing or invalid Moves API Key');
+		if (res.statusCode === 401) {
+			res.send('Missing or invalid Moves API Key');
+			return;
 		}
 
 		var data = JSON.parse(body)[0];
 
 		var output = {};
+		output.date = dateString;
 		output.walking = {};
 		output.transport = {};
 
