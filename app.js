@@ -33,6 +33,7 @@ dotenv.load({ path: '.env' });
  * Controllers (route handlers).
  */
 var homeController = require('./controllers/home');
+var signupController = require('./controllers/signup');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var movesController = require('./controllers/moves');
@@ -75,7 +76,7 @@ serialPort.list(function (err, ports) {
       exports.serialPort = new SerialPort(process.env.SERIALPORT, {
          baudrate: process.env.BAUDRATE
       });
-      
+
       exports.printer = new Printer(exports.serialPort);
     }
     else {
@@ -83,7 +84,7 @@ serialPort.list(function (err, ports) {
     }
   });
 });
-   
+
 
 /**
  * Express configuration.
@@ -140,7 +141,9 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
+app.get('/landing', signupController.index);
 app.get('/', homeController.index, passportConf.isAuthenticated);
+app.post('/express_interest', signupController.postSubmitEmail);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
@@ -208,6 +211,7 @@ app.get('/api/fitbit', fitbitController.getFitbitProfile);
  */
 app.get('/api/moves/distance', movesController.getAggregatedDistance);
 app.get('/api/moves/profile', passportConf.isAuthenticated, passportConf.isAuthorized, movesController.getMovesProfile);
+app.get('/api/moves/summary', movesController.getSummaryByDateRange);
 
 /**
  * Thermal printer & Serial communications with Arduino

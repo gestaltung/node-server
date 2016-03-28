@@ -1,9 +1,9 @@
 var nodemailer = require("nodemailer");
 var transporter = nodemailer.createTransport({
-  service: 'SendGrid',
+  service: 'Mailgun',
   auth: {
-    user: process.env.SENDGRID_USER,
-    pass: process.env.SENDGRID_PASSWORD
+    user: process.env.MAILGUN_USER,
+    pass: process.env.MAILGUN_PASSWORD
   }
 });
 
@@ -36,8 +36,8 @@ exports.postContact = function(req, res) {
   var from = req.body.email;
   var name = req.body.name;
   var body = req.body.message;
-  var to = 'your@email.com';
-  var subject = 'Contact Form | Hackathon Starter';
+  var to = 'zi12467+extempore@my.bristol.ac.uk';
+  var subject = 'Extempore';
 
   var mailOptions = {
     to: to,

@@ -15,7 +15,7 @@ var User = require('../models/User');
 exports.getDocs = function(req, res) {
   var data = [];
   data.push({
-    'path': '/api/docs',
+    'path': '/api/fitbit/docs',
     'description': 'This page',
     'parameters': ['bla', 'bla', 'bla']
   })

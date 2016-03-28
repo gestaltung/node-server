@@ -14,15 +14,16 @@ module.exports = function(grunt) {
 		gst: {
 			// paths
 			client: 'public',
-			css: 'public/css'
+			css: 'public/css',
+			dist: 'dist'
 		},
 
-		watch: {
-			sass: {
-			  files: ['<%= gst.client %>/css/**/*.{scss,sass}'],
-			  tasks: ['sass']
-			}
-		},
+		// watch: {
+		// 	sass: {
+		// 	  files: ['<%= gst.client %>/css/**/*.{scss,sass}'],
+		// 	  tasks: ['sass']
+		// 	}
+		// },
 
 		// Compiles Sass to CSS
 		sass: {
@@ -36,18 +37,62 @@ module.exports = function(grunt) {
 		  }
 		},
 
+		// Copies remaining files to places other tasks can use
+		copy: {
+			dist: {
+				files: [{
+					expand: true,
+					dot: true,
+					dest: '.tmp/dist',
+					src: [
+						'*.js'
+					]
+				}]
+			}
+		},
+
+		// Inject js and css to files
+		injector: {
+			// No need to inject component scss into one file
+			// because it's all imported.
+			sass: {
+
+			},
+
+			// Inject css into index.html
+			css: {
+				options: {
+					starttag: '<!-- injector:css -->',
+					endtag: '<!-- endinjector -->'
+				},
+
+				files: {
+					'.tmp/dist/index.html': [
+						'.tmp/dist/app.css'
+					]
+				}
+			}
+		},
+
 		concurrent: {
 			dist: [
 				'sass'
+			],
+			post: [
+				'injector:sass'
 			]
 		}
-	})
+
+	});
 
 	grunt.registerTask('build', [
 		// 'clean:dist',
 		// 'concurrent:dist',
 		// 'concat',
-		// 'uglify'
-		'concurrent:dist'
+		// 'sass',
+		// 'uglify',
+		'concurrent:dist',
+		'copy:dist',
+		'injector:css'
 	]);
 }
