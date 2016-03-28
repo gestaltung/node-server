@@ -20,6 +20,9 @@ tmp
 node_modules
 bower_components
 
+# caches
+.sass_cache
+
 # Editors
 .idea
 *.iml
