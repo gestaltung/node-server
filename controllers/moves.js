@@ -29,10 +29,9 @@ exports.getMovesProfile = function(req, res, next) {
 
 
   var query = querystring.stringify({
-    'access_token': token.accessToken,
-    'trackPoints': true
+    'access_token': token.accessToken
   });
-  var url = 'https://api.moves-app.com/api/1.1/user/places/daily/20160213?' + query;
+  var url = 'https://api.moves-app.com/api/1.1/user/profile?' + query;
 
   request.get(url, function(err, request, body) {
     if (err) {
@@ -159,14 +158,15 @@ exports.getAggregatedDistance = function(req, res) {
  * @param {start date} [start] [in YYYYMMDD format]
  *
  * Returns activity summary for specified date range
+ *
+ * TO DO: Make sure end date of range isn't in the future
  */
 exports.getSummaryByDateRange = function(req, res) {
   request = require('request');
 
-  var baseUrl = 'https://api.moves-app.com/api/1.1/user';
+  var baseUrl = 'https://api.moves-app.com/api/1.1/user/summary/daily';
 
-  var baseUrl = 'https://api.moves-app.com/api/1.1/user';
-  var token, userID, range, startDate;
+  var token, userID, range, startDate, url;
 
   if (req.query.range && req.query.start) {
     range = req.query.range;
@@ -185,21 +185,63 @@ exports.getSummaryByDateRange = function(req, res) {
     res.status(400).send(err);
   }
 
-
   // Date stuff
-  var date;
-  if (req.query.date) {
-    date = moment(req.query.date, "YYYYMMDD").startOf('day');
+  var date, dateString;
+  var from = null;
+  var to = null;
+
+  date = moment(req.query.start, 'YYYYMMDD').startOf('day');
+  if (req.query.range === 'daily') {
+    dateString = date.format('YYYYMMDD');
+    baseUrl += '/' + dateString;
+  }
+  else if (req.query.range === 'weekly') {
+    // Uses ISO8601 week-numbering.
+    // baseUrl += '/' + date.format("YYYY-")+ "W" + date.format("WW");
+    from = date.format('YYYYMMDD');
+    to = date.add(7, 'days').format('YYYYMMDD');
+  }
+  else if (req.query.range === 'monthly') {
+    // baseUrl += '/' + date.format("YYYY-MM");
+    from = date.format('YYYMMDD');
+    to = date.add(1, 'months').format('YYYYMMDD');
   }
   else {
-    // Else get yesterday's date
-    date = moment().add(-1, 'days').startOf('day');
+    res.status(400).send({
+      'status': 'err',
+      'message': 'Date range format incorrectly specified.'
+    });
   }
-  var dateString = date.format('YYYYMMDD');
 
-  var query = querystring.stringify({
-    'access_token': req.query.access_token || token.accessToken
-  });
+  console.log('reached here');
+  var query;
+  if (from && to) {
+    query = querystring.stringify({
+      'from': from,
+      'to': to,
+      'access_token': req.query.access_token || token.accessToken
+    });
+  }
+  else {
+    query = querystring.stringify({
+      'access_token': req.query.access_token || token.accessToken
+    });
+  }
+
+
+  url = baseUrl + '?' + query;
+  console.log(url);
+  request.get(url, function(err, request, body) {
+    if (err) {
+      res.send(err);
+    }
+
+    var data = JSON.parse(body)[0];
+
+    return res.json(data);
+  })
+
+  // res.send({});
 }
 
 

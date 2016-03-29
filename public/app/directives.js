@@ -22,7 +22,7 @@ angular.module('gestaltung.directives', [])
 
 				var mapSvg = mapContainer.append('svg').attr('width', 500).attr('height', 500);
 				var coordinates = {};
-				
+
 				scope.$watch("name", function(newValue, oldValue) {
 					// console.log('new val', newValue);
 					// artistContainer.append('p').text(scope.name);
@@ -76,7 +76,7 @@ angular.module('gestaltung.directives', [])
 						.interpolate("linear");
 
 					mapSvg = mapContainer.append('svg').attr('width', width).attr('height', height);
-					
+
 					var path = mapSvg
 						.append("path")
 						.attr("d", lineFunction(scope.trackPoints))
@@ -106,196 +106,72 @@ angular.module('gestaltung.directives', [])
 						})
 				}
 			}
-		}  
-	})
-	.directive('artistCloud', function() {
-		return {
-			link: function(scope, elm, attrs) {
-				var artistContainer = d3.select(elm[0])
-					.append('div')
-					.attr('id', 'artistContainer');
-
-				scope.$watch("data", function(newValue, oldValue) {
-					if (newValue == oldValue) {
-						// Initializing
-						return;
-					}
-
-
-					var artists = _.uniqBy(scope.data.lastfmScrobbles, 'artist');
-
-					d3.select('#artistContainer').selectAll("*").remove();
-					artistContainer.selectAll('p')
-						.data(artists, function(d) {
-							return d.artist;
-						})
-						.enter()
-						.append('p')
-						.text(function(d) {
-							return d.artist;
-						})
-					
-				})
-			}
 		}
 	})
-	.directive('placesSummary', function() {
-		return {
-			link: function(scope, elm, attr) {
-				var placesContainer = d3.select(elm[0])
-					.append('div')
-					.attr('id', 'placesContainer');
+  .directive('placesSummary', function() {
+    return {
+      link: function(scope, elm, attr) {
+        var placesContainer = d3.select(elm[0])
+          .append('div')
+          .attr('id', 'placesContainer');
 
-				scope.$watch('data', function(newValue, oldValue) {
-					if (newValue == oldValue) {
-						return;
-					}
-					var places = _.filter(scope.data.movesStoryline, function(d) {
-						if (d.type === 'place') {
-							return d.place !== 'unknown'
-						}
-						return false;
-					})
-					console.log('scope.places', scope.places);
+        scope.$watch('data', function(newValue, oldValue) {
+          if (newValue == oldValue) {
+            return;
+          }
+          var places = _.filter(scope.data.movesStoryline, function(d) {
+            if (d.type === 'place') {
+              return d.place !== 'unknown'
+            }
+            return false;
+          })
+          console.log('scope.places', scope.places);
 
-					places = _.uniqBy(places, 'place');
-					console.log('places', places);
+          places = _.uniqBy(places, 'place');
+          console.log('places', places);
 
-					d3.select('#placesContainer').selectAll("*").remove();
-					placesContainer.selectAll('p')
-						.data(places)
-						.enter()
-						.append('p')
-						.text(function(d) {
-							return d.place;
-						})
-				})
-			}
-		}
-	})
-	.directive('userReflection', function() {
-		return {
-			link: function(scope, elm, attrs) {
-				var mirrorContainer = d3.select(elm[0])
-					.append('div')
-					.attr('id', 'mirrorContainer');
+          d3.select('#placesContainer').selectAll("*").remove();
+          placesContainer.selectAll('p')
+            .data(places)
+            .enter()
+            .append('p')
+            .text(function(d) {
+              return d.place;
+            })
+        })
+      }
+    }
+  })
+	// .directive('artistCloud', function() {
+	// 	return {
+	// 		link: function(scope, elm, attrs) {
+	// 			var artistContainer = d3.select(elm[0])
+	// 				.append('div')
+	// 				.attr('id', 'artistContainer');
 
-				scope.$watch("data", function(newVal, oldValue) {
-					if (scope.data) {
-						// get user media
-						// webcam
-						var camTex;
-						var uniforms, scene, camera, renderer, texture;
-						var videoLoaded = false;
-						var video = $(elm).append('<video id="video"></video>');
-						var container = $(elm).append('<div id="container"></div>');
-						container = document.getElementById("container");
-						var clock = new THREE.Clock();
-						
-						video = document.getElementById("video");
-						video.autoplay = true;
-
-						video.addEventListener( 'loadedmetadata', function ( event ) {
-						    video.style.width = window.innerWidth + 'px';
-						    video.style.height = window.innerHeight + 'px';
-
-						    initGL();
-						});
-
-				    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
-					
-					  if (navigator.getUserMedia) {       
-				      navigator.getUserMedia({video: true, audio: false}, function(stream) {
-							  var url = window.URL || window.webkitURL;
-								video.src = url ? url.createObjectURL(stream) : stream;
-
-								video.autoplay = true;
-								// videoLoaded = true;
-				      }, function(error) {
-						    alert("There seems to be something wrong with your webcam :(");
-				      });
-					  }
-
-						function initGL() {
-							// gl = video.getContext("webgl", { antialias: false,
-							// 																	depth: false });
-
-							camera = new THREE.Camera();
-							camera.position.z = 1;
-
-							scene = new THREE.Scene();
-
-							texture = new THREE.Texture(video);
-							texture.minFilter = THREE.LinearFilter;
-							texture.magFilter = THREE.LinearFilter;
-							// texture.format = THREE.RGBFormat;
-							// texture.generateMipmaps = false;
-							// texture.needsUpdate = true;
-
-							uniforms = {
-								u_image: {
-									type: "t",
-									value: 0,
-									texture: texture
-								}
-							}
-							
-							var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-							var material = new THREE.ShaderMaterial({
-								uniforms: uniforms,
-								vertexShader: ["varying vec2 vUv;",
-									"vec4 pos;",
-									"void main() {",
-									"vUv = uv;",
-									"pos = vec4(position.xy, 0.0, 1.0);",
-									"gl_Position=projectionMatrix * modelViewMatrix * pos;",
-									"}"].join("\n"),
-								fragmentShader: ["uniform sampler2D u_image;",
-									"varying vec2 vUv;",
-									"void main() {",
-									"vec2 mod_texcoord = vUv.xy + vec2((0.2)*cos((0.0005)+5.0*uv.x*3.14159265359),0.0);",
-									"gl_FragColor = texture2D(u_image, mod_texcoord);",
-									"}"].join("\n")
-							});
-
-							var mesh = new THREE.Mesh( geometry, material );
-							scene.add(mesh);
-
-							renderer = new THREE.WebGLRenderer();
-							renderer.setSize(window.innerWidth, window.innerHeight);
-							container.appendChild(renderer.domElement);
-							renderer.domElement.style.width = window.innerWidth + 'px';
-							renderer.domElement.style.height = window.innerHeight + 'px';
-
-							animate();
-						};
+	// 			scope.$watch("data", function(newValue, oldValue) {
+	// 				if (newValue == oldValue) {
+	// 					// Initializing
+	// 					return;
+	// 				}
 
 
-						function animate() {
-							var delta = clock.getDelta();
-							// uniforms.time.value += delta/2;
+	// 				var artists = _.uniqBy(scope.data.lastfmScrobbles, 'artist');
 
-							requestAnimationFrame(animate);
+	// 				d3.select('#artistContainer').selectAll("*").remove();
+	// 				artistContainer.selectAll('p')
+	// 					.data(artists, function(d) {
+	// 						return d.artist;
+	// 					})
+	// 					.enter()
+	// 					.append('p')
+	// 					.text(function(d) {
+	// 						return d.artist;
+	// 					})
 
-					    texture.needsUpdate = true;
-							if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-							}
-
-							renderer.render( scene, camera );
-						}
-
-
-						function loop() {
-							window.requestAnimationFrame(loop);
-							if (videoLoaded) {
-								
-							}
-						}
+	// 			})
+	// 		}
+	// 	}
+	// })
 
 
-				    
-					}
-				});
-			}
-		}
-	});

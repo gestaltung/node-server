@@ -1,20 +1,26 @@
 extends layout
 
 block content
-	.row#dashboard
-		.row
-			include partials/header
-		div(ng-controller='DashboardCtrl')
-			.row
-				div.col-sm-8.date-picker(class="text-center")
-					a(class="fa fa-chevron-left" ng-click="removeDate()")
-					{{date.format('DD/MM/YYYY')}}&nbsp
-					a(class="fa fa-chevron-right" ng-click="addDate()")
-				div.col-sm-4
-					a.btn(ng-click="printSummary()")
-						h5 Print Summary
-			.row
-				div.col-sm-8(user-dashboard)
-				div.col-sm-2(artist-cloud)
-				div.col-sm-2(places-summary)
-			//- div(user-reflection)
+  script(src='/bower_components/moment/moment.js')
+  script(src='/bower_components/d3/d3.js')
+  script(src='/bower_components/lodash/dist/lodash.js')
+  .row#dashboard
+    //- .row
+    //-   include partials/header
+    div(ng-controller='DailyDashboardCtrl')
+      .row
+        a(ng-href="dashboard/#/weekly")
+            h5 Weekly View
+      .row
+        div.col-sm-8.date-picker(ng-if="date" class="text-center")
+          a(class="fa fa-chevron-left" ng-click="removeDate()")
+          {{date.format('DD/MM/YYYY')}}&nbsp
+          a(class="fa fa-chevron-right" ng-click="addDate()")
+        div.col-sm-4
+          a.btn(ng-click="printSummary()")
+            h5 Print Summary
+      .row
+        div.col-sm-8(user-dashboard)
+        div.col-sm-2(artist-cloud)
+        div.col-sm-2(places-summary)
+      //- div(user-reflection)

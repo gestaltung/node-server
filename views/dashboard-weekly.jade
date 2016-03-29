@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  script(src='/bower_components/moment/moment.js')
+  script(src='/bower_components/d3/d3.js')
+  script(src='/bower_components/lodash/dist/lodash.js')
+  .row#dashboard
+    //- .row
+    //-   include partials/header
+    //-   indlude partials/dashboard_navigator
+    div(ng-controller='WeeklyDashboardCtrl')
+      .row

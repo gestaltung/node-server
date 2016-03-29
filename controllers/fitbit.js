@@ -23,7 +23,7 @@ exports.getDocs = function(req, res) {
 };
 
 /**
- * GET /api/fitbit
+ * GET /api/fitbit/profile
  */
 exports.getFitbitProfile = function(req, res, next) {
   fitbit = require("fitbit-node");

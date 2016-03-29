@@ -20,7 +20,6 @@ var passport = require('passport');
 var expressValidator = require('express-validator');
 var sass = require('node-sass-middleware');
 var _ = require('lodash');
-var livereload = require('livereload');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -32,6 +31,7 @@ dotenv.load({ path: '.env' });
 /**
  * Controllers (route handlers).
  */
+var summaryController = require('./controllers/summary');
 var homeController = require('./controllers/home');
 var signupController = require('./controllers/signup');
 var userController = require('./controllers/user');
@@ -39,6 +39,7 @@ var apiController = require('./controllers/api');
 var movesController = require('./controllers/moves');
 var authenticationController = require('./controllers/authentication');
 var fitbitController = require('./controllers/fitbit');
+var lastfmController = require('./controllers/lastfm');
 var thermalController = require('./controllers/thermal');
 var contactController = require('./controllers/contact');
 var dashboardController = require('./controllers/dashboard');
@@ -52,6 +53,24 @@ var passportConf = require('./config/passport');
  * Create Express server.
  */
 var app = express();
+
+/**
+ * Setup CORS
+ */
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+  if (req.method === 'OPTIONS') {
+    res.send(200)
+  }
+  else {
+    next()
+  }
+}
+
+app.use(allowCrossDomain);
 
 /**
  * Connect to MongoDB.
@@ -175,7 +194,8 @@ app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdate
 /**
  * Dashboard routes
  */
-app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashboard);
+app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDailyDashboard);
+app.get('/dashboard/weekly', passportConf.isAuthenticated, dashboardController.getWeeklyDashboard);
 
 /**
  * Authentication for other devices
@@ -183,13 +203,19 @@ app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDashb
 app.get('/api/authenticate', authenticationController.getTokens);
 
 /**
+ * API testing routes
+ */
+app.get('/test', passportConf.isAuthenticated, apiController.getApiTests);
+
+/**
  * API examples routes.
  */
 app.get('/api', apiController.getApi);
 app.get('/api/docs', apiController.getDocs);
-app.get('/api/getDailySummary', apiController.getDailySummary);
-// app.get('/api/lastfm', apiController.getLastfm);
-app.get('/api/lastfm/getRecentTracks', apiController.getRecentTracks);
+app.get('/api/summary/daily', summaryController.getDailySummary);
+// app.get('/api/lastfm/getRecentTracks', summaryController.getRecentTracks);
+app.get('/api/lastfm/artists', lastfmController.getTopArtists);
+// app.get('/api/lastfm', summaryController.getLastfm);
 // app.get('/api/twilio', apiController.getTwilio);
 // app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
@@ -204,13 +230,13 @@ app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthoriz
 app.get('/api/fitbit/sleep', fitbitController.getSleepSummary);
 app.get('/api/fitbit/activity', fitbitController.getActivitySummary);
 app.get('/api/fitbit/refresh', fitbitController.getFitbitRefreshToken);
-app.get('/api/fitbit', fitbitController.getFitbitProfile);
+app.get('/api/fitbit/profile', fitbitController.getFitbitProfile);
 
 /**
  * Moves-Specific Routes.
  */
 app.get('/api/moves/distance', movesController.getAggregatedDistance);
-app.get('/api/moves/profile', passportConf.isAuthenticated, passportConf.isAuthorized, movesController.getMovesProfile);
+app.get('/api/moves/profile', passportConf.isAuthenticated, movesController.getMovesProfile);
 app.get('/api/moves/summary', movesController.getSummaryByDateRange);
 
 /**
@@ -273,10 +299,5 @@ app.listen(app.get('port'), function() {
   console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
 
-/**
- * Connect to LiveReload server
- */
-server = livereload.createServer();
-server.watch([__dirname + "/public", __dirname + "/views"]);
 
 module.exports = app;

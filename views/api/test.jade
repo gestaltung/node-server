@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  .container
+    .row
+      h1 API Tests/Documentation
+      h2 Account/Authentication
+      h2 Data Retrieval
+      a.btn(href="/api/moves/distance")
+        h3 /api/moves/distance
+      a.btn(href="/api/moves/profile")
+        h3 /api/moves/profile
+      a.btn(href="/api/moves/summary?range=daily&start=20160315")
+        h3 /api/moves/summary
+      a.btn(href="/api/fitbit/sleep")
+        h3 /api/fitbit/sleep
+      a.btn(href="/api/fitbit/activity")
+        h3 /api/fitbit/activity
+      a.btn(href="/api/fitbit/profile")
+        h3 /api/fitbit/profile
+      a.btn(href="/api/lastfm/artists?from=20160301&to=20160327")
+        h3 /api/lastfm/artists
+

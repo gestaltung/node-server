@@ -2,10 +2,10 @@
 
 /* Controller */
 angular.module('gestaltung.controllers', [])
-	.controller('DashboardCtrl', function($scope, $http, $timeout, $interval) {
-		console.log('DashboardCtrl instantiated');
+	.controller('DailyDashboardCtrl', function($scope, $http, $timeout, $interval) {
+		console.log('DailyDashboardCtrl instantiated');
 		// 1 sec is 5 minutes
-		var timeFactor = 5; 
+		var timeFactor = 5;
 		$scope.name = null;
 		$scope.trackPoints = null;
 		$scope.date = moment().add(-1, 'day');
@@ -82,7 +82,7 @@ angular.module('gestaltung.controllers', [])
 			console.log('date', date);
 			$http({
 				method: 'GET',
-				url: '/api/getDailySummary',
+				url: '/api/summary/daily',
 				params: {
 					'date': date
 				}
@@ -127,3 +127,11 @@ angular.module('gestaltung.controllers', [])
 			// }
 		}
 	})
+  .controller('WeeklyDashboardCtrl', function($scope, $http, $timeout, $interval) {
+    console.log('weekly controller instantiated');
+  })
+  .controller('MonthlyDashboardCtrl', function($scope, $http, $timeout, $interval) {
+    console.log('monthly controller instantiated');
+  })
+
+
