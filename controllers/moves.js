@@ -236,7 +236,7 @@ exports.getSummaryByDateRange = function(req, res) {
       res.send(err);
     }
 
-    var data = JSON.parse(body)[0];
+    var data = JSON.parse(body);
 
     return res.json(data);
   })

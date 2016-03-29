@@ -65,10 +65,10 @@ exports.getSleepSummary = function(req, res, next) {
   console.log('sleep date: ', req.query.date);
 
   if (!req.query.date) {
-    date = moment().format('YYYY-MM-DD');
+    date = moment().format('YYYYMMDD');
   }
   else {
-    date = moment(req.query.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    date = moment(req.query.date, 'YYYYMMDD').format('YYYY-MM-DD');
   }
 
   var query = querystring.stringify({
@@ -97,39 +97,39 @@ exports.getSleepSummary = function(req, res, next) {
  *
  * @param {date} [date] [in YYYYMMDD format]
  */
-exports.getActivitySummary = function(req, res, next) {
-  request = require('request');
-  var token = _.find(req.user.tokens, { kind: 'fitbit' });
-  var userID = req.user.fitbit;
-  console.log('sleep date: ', req.query.date);
+// exports.getActivitySummary = function(req, res, next) {
+//   request = require('request');
+//   var token = _.find(req.user.tokens, { kind: 'fitbit' });
+//   var userID = req.user.fitbit;
+//   console.log('sleep date: ', req.query.date);
 
-  if (!req.query.date) {
-    date = moment().format('YYYY-MM-DD');
-  }
-  else {
-    date = moment(req.query.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-  }
+//   if (!req.query.date) {
+//     date = moment().format('YYYY-MM-DD');
+//   }
+//   else {
+//     date = moment(req.query.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+//   }
 
-  var query = querystring.stringify({
-    'access_token': token.accessToken
-  });
+//   var query = querystring.stringify({
+//     'access_token': token.accessToken
+//   });
 
-  var options = {
-    url: 'https://api.fitbit.com/1/user/'+userID+'/activities/date/'+date+'.json?' + query,
-    headers: {
-      'Authorization': 'Bearer ' + token.accessToken,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  }
+//   var options = {
+//     url: 'https://api.fitbit.com/1/user/'+userID+'/activities/date/'+date+'.json?' + query,
+//     headers: {
+//       'Authorization': 'Bearer ' + token.accessToken,
+//       'Content-Type': 'application/x-www-form-urlencoded'
+//     }
+//   }
 
-  request.get(options, function(err, request, body) {
-    if (err) {
-      res.send(err);
-    }
+//   request.get(options, function(err, request, body) {
+//     if (err) {
+//       res.send(err);
+//     }
 
-    res.json(JSON.parse(body));
-  })
-}
+//     res.json(JSON.parse(body));
+//   })
+// }
 
 /**
  * GET /api/fitbit/refresh
@@ -167,6 +167,7 @@ exports.getFitbitRefreshToken = function(req, res, next) {
     var response = JSON.parse(body);
 
     // Update access and refresh tokens
+    // This doesn't work
     User.findById(req.user.id, function(err, user) {
       var tokenIndex = _.findIndex(user.tokens, { kind: 'fitbit' });
       if (tokenIndex != -1) {

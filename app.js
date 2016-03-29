@@ -228,7 +228,7 @@ app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthoriz
  * Fitbit-Specific Routes.
  */
 app.get('/api/fitbit/sleep', fitbitController.getSleepSummary);
-app.get('/api/fitbit/activity', fitbitController.getActivitySummary);
+// app.get('/api/fitbit/activity', fitbitController.getActivitySummary);
 app.get('/api/fitbit/refresh', fitbitController.getFitbitRefreshToken);
 app.get('/api/fitbit/profile', fitbitController.getFitbitProfile);
 
