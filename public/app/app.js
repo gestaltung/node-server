@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('gestaltung', ['ngRoute', 'gestaltung.directives', 'gestaltung.services', 'gestaltung.controllers'])
+angular.module('gestaltung', ['ngRoute', 'gestaltung.directives', 'lastfm.directives', 'moves.directives', 'gestaltung.services', 'gestaltung.controllers'])
   .config(function($routeProvider, $locationProvider) {
     // $routeProvider
     //   .when('/dashboard', {

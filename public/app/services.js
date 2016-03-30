@@ -8,8 +8,7 @@ angular.module('gestaltung.services', [])
   .factory('Data', function() {
     return {
       lastfm: function(data) {
-        console.log(data);
-        return;
+        return data;
       },
       moves: function(data) {
         console.log(data);

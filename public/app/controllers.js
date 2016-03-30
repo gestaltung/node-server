@@ -129,20 +129,23 @@ angular.module('gestaltung.controllers', [])
 	})
   .controller('WeeklyDashboardCtrl', function($scope, $http, $q, $timeout, $interval, Data) {
     console.log('weekly controller instantiated');
-    $scope.dates = {}
+    $scope.dates = {};
     $scope.dates.from = moment().add(-1, 'weeks').format('YYYYMMDD');
     $scope.dates.to = moment().format('YYYYMMDD');
     $scope.dates.from = "20160313";
     $scope.dates.to = "20160320";
+    $scope.data;
 
+    // Make sure requests are made in parallel
     $q.all([
       $http.get('/api/lastfm/artists?from=' + $scope.dates.from + '&to=' + $scope.dates.to),
       $http.get('/api/moves/summary?range=weekly&start=' + $scope.dates.from)
     ])
     .then(function(responses) {
-        // console.log(responses);
-        Data.lastfm(responses[0].data);
-        Data.moves(responses[1].data);
+      $scope.data = {};
+      $scope.data.lastfm = Data.lastfm(responses[0].data);
+      $scope.data.moves = Data.moves(responses[1].data);
+      console.log($scope.data);
     });
   })
   .controller('MonthlyDashboardCtrl', function($scope, $http, $timeout, $interval) {
