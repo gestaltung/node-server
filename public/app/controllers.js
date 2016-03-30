@@ -127,8 +127,8 @@ angular.module('gestaltung.controllers', [])
 			// }
 		}
 	})
-  .controller('WeeklyDashboardCtrl', function($scope, $http, $q, $timeout, $interval, Data) {
-    console.log('weekly controller instantiated');
+  .controller('CustomDashboardCtrl', function($scope, $http, $q, $timeout, $interval, Data) {
+    console.log('custom range dashboard controller instantiated');
     $scope.dates = {};
     $scope.dates.from = moment().add(-1, 'weeks').format('YYYYMMDD');
     $scope.dates.to = moment().format('YYYYMMDD');
@@ -139,7 +139,7 @@ angular.module('gestaltung.controllers', [])
     // Make sure requests are made in parallel
     $q.all([
       $http.get('/api/lastfm/artists?from=' + $scope.dates.from + '&to=' + $scope.dates.to),
-      $http.get('/api/moves/summary?range=weekly&start=' + $scope.dates.from)
+      $http.get('/api/moves/summary?from=' + $scope.dates.from + '&to=' + $scope.dates.to)
     ])
     .then(function(responses) {
       $scope.data = {};
@@ -147,9 +147,6 @@ angular.module('gestaltung.controllers', [])
       $scope.data.moves = Data.moves(responses[1].data);
       console.log($scope.data);
     });
-  })
-  .controller('MonthlyDashboardCtrl', function($scope, $http, $timeout, $interval) {
-    console.log('monthly controller instantiated');
   })
 
 

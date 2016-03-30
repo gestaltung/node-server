@@ -8,9 +8,9 @@ exports.getDailyDashboard = function(req, res) {
   });
 };
 
-exports.getWeeklyDashboard = function(req, res) {
-  res.render('dashboard-weekly', {
-    title: 'Weekly Dashboard View'
+exports.getCustomDashboard = function(req, res) {
+  res.render('dashboard-custom', {
+    title: 'Custom Range Dashboard View'
   });
 };
 

@@ -9,8 +9,8 @@ block content
     //-   include partials/header
     div(ng-controller='DailyDashboardCtrl')
       .row
-        a(ng-href="dashboard/weekly")
-            h5 Weekly View
+        a(ng-href="dashboard/custom")
+            h5 Custom View
       .row
         div.col-sm-8.date-picker(ng-if="date" class="text-center")
           a(class="fa fa-chevron-left" ng-click="removeDate()")

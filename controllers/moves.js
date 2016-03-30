@@ -153,8 +153,9 @@ exports.getAggregatedDistance = function(req, res) {
 /**
  * GET /api/moves/summary
  *
- * @param {date range} [range] [monthly||weekly||daily]
- * @param {start date} [start] [in YYYYMMDD format]
+ * @param {start date} [from] [in YYYYMMDD format]
+ * @param {end date} [to] [in YYYYMMDD format]
+ * @param {date date} [date] [YYYYMMDD — Optional]
  *
  * Returns activity summary for specified date range
  *
@@ -165,17 +166,11 @@ exports.getSummaryByDateRange = function(req, res) {
 
   var baseUrl = 'https://api.moves-app.com/api/1.1/user/summary/daily';
 
-  var token, userID, range, startDate, url;
-
-  if (req.query.range && req.query.start) {
-    range = req.query.range;
-    startDate = req.query.start;
-  }
-  else {
-    res.status(400).send({'err': 'Date Range and/or Start Date not provided'});
-  }
+  var token, userID, range, startDate, url, from, to, date;
+  var query;
 
   // OpenFrameworks won't have tokens in request.
+  // Instead it will be hardcoded in the request.
   try {
     token = _.find(req.user.tokens, { kind: 'moves' });
     userID = req.user.moves;
@@ -184,49 +179,29 @@ exports.getSummaryByDateRange = function(req, res) {
     res.status(400).send(err);
   }
 
-  // Date stuff
-  var date, dateString;
-  var from = null;
-  var to = null;
-
-  date = moment(req.query.start, 'YYYYMMDD').startOf('day');
-  if (req.query.range === 'daily') {
-    dateString = date.format('YYYYMMDD');
-    baseUrl += '/' + dateString;
-  }
-  else if (req.query.range === 'weekly') {
-    // Uses ISO8601 week-numbering.
-    // baseUrl += '/' + date.format("YYYY-")+ "W" + date.format("WW");
-    from = date.format('YYYYMMDD');
-    to = date.add(7, 'days').format('YYYYMMDD');
-  }
-  else if (req.query.range === 'monthly') {
-    // baseUrl += '/' + date.format("YYYY-MM");
-    from = date.format('YYYMMDD');
-    to = date.add(1, 'months').format('YYYYMMDD');
-  }
-  else {
-    res.status(400).send({
-      'status': 'err',
-      'message': 'Date range format incorrectly specified.'
-    });
-  }
-
-  console.log('reached here');
-  var query;
-  if (from && to) {
+  if (req.query.from && req.query.to) {
+    from = req.query.from;
+    to = req.query.to;
     query = querystring.stringify({
       'from': from,
       'to': to,
       'access_token': req.query.access_token || token.accessToken
     });
   }
-  else {
+  else if(req.query.date) {
+    date = req.query.date;
     query = querystring.stringify({
       'access_token': req.query.access_token || token.accessToken
     });
   }
+  else {
+    res.status(400).send({
+      'status': 'err',
+      'msg': 'Start and/or end date not provided'
+    });
+  }
 
+  console.log('reached here');
 
   url = baseUrl + '?' + query;
   console.log(url);

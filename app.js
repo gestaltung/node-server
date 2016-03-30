@@ -195,7 +195,7 @@ app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdate
  * Dashboard routes
  */
 app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDailyDashboard);
-app.get('/dashboard/weekly', passportConf.isAuthenticated, dashboardController.getWeeklyDashboard);
+app.get('/dashboard/custom', passportConf.isAuthenticated, dashboardController.getCustomDashboard);
 
 /**
  * Authentication for other devices
