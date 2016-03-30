@@ -127,8 +127,23 @@ angular.module('gestaltung.controllers', [])
 			// }
 		}
 	})
-  .controller('WeeklyDashboardCtrl', function($scope, $http, $timeout, $interval) {
+  .controller('WeeklyDashboardCtrl', function($scope, $http, $q, $timeout, $interval, Data) {
     console.log('weekly controller instantiated');
+    $scope.dates = {}
+    $scope.dates.from = moment().add(-1, 'weeks').format('YYYYMMDD');
+    $scope.dates.to = moment().format('YYYYMMDD');
+    $scope.dates.from = "20160313";
+    $scope.dates.to = "20160320";
+
+    $q.all([
+      $http.get('/api/lastfm/artists?from=' + $scope.dates.from + '&to=' + $scope.dates.to),
+      $http.get('/api/moves/summary?range=weekly&start=' + $scope.dates.from)
+    ])
+    .then(function(responses) {
+        // console.log(responses);
+        Data.lastfm(responses[0].data);
+        Data.moves(responses[1].data);
+    });
   })
   .controller('MonthlyDashboardCtrl', function($scope, $http, $timeout, $interval) {
     console.log('monthly controller instantiated');

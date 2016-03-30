@@ -150,7 +150,6 @@ exports.getAggregatedDistance = function(req, res) {
 	});
 }
 
-
 /**
  * GET /api/moves/summary
  *

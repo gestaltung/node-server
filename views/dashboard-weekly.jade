@@ -9,4 +9,9 @@ block content
     //-   include partials/header
     //-   indlude partials/dashboard_navigator
     div(ng-controller='WeeklyDashboardCtrl')
-      .row
+      div(ng-if="dates.from")
+        h3 From
+        {{dates.from}}
+      div(ng-if="dates.to")
+        h3 To
+        {{dates.to}}
