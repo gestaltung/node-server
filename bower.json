@@ -23,6 +23,7 @@
     "lodash": "^4.5.0",
     "moment": "^2.11.2",
     "three.js": "threejs#*",
-    "angular-ui-router": "^0.2.18"
+    "angular-ui-router": "^0.2.18",
+    "d3-cloud": "^1.2.1"
   }
 }

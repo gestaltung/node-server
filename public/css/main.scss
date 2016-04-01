@@ -106,7 +106,7 @@ footer {
 
 #dashboard {
   // border: 1px solid $brand-secondary;
-  height: 100%;
+  min-height: 100%;
   padding-top: 5%;
   background: $black;
   color: $white;

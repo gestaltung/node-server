@@ -20,17 +20,17 @@ angular.module('moves.directives', [])
           }
 
           d3.select('#movesContainer').selectAll("*").remove();
+          movesContainer.selectAll('p')
+            .data(scope.data.moves)
+            .enter()
+            .append('p')
+            .text(function(d) {
+              return '' + d.distance/1000 + ' km';
+            })
           _.each(scope.data.moves, function(activity) {
-            movesContainer.append('h1')
-              .text(activity.group)
+            // movesContainer.append('h1')
+            //   .text(activity.group)
 
-            movesContainer.selectAll('p')
-              .data(activity)
-              .enter()
-              .append('p')
-              .text(function(d) {
-                return '' + d.distance/1000 + ' km';
-              })
           })
         })
       }

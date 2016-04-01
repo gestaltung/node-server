@@ -3,7 +3,8 @@ To-Do
 
 High Priority
 ---
-Deploy and migrate to mLab
+Add ng-datepicker
+Range should be a maximum of 31 days
 
 Medium Priority
 ---
