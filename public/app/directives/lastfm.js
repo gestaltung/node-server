@@ -16,55 +16,46 @@ angular.module('lastfm.directives', [])
             return;
           }
 
-          var cloud = new ArtistCloud();
-          cloud.init(scope.data.lastfm);
-          cloud.draw();
+          var artistCloud = cloud().width(500).height(500);
+          d3.select('#lastfmContainer')
+            .datum(scope.data.lastfm)
+            .call(artistCloud);
 
-          // lastfmContainer.selectAll('p')
-          //   .data(scope.data.lastfm)
-          //   .enter()
-          //   .append('p')
-          //   .text(function(d) {
-          //     return d.artist + ' ' + d.playcount + 'x';
-          //   })
         })
       }
     }
   })
 
-/**
- * Artist Cloud Object
- */
-var ArtistCloud = function() {
-  return {
-    data: '',
-    layout: '',
-    size: '',
-    init: function(data) {
-      this.data = data;
-      this.size = d3.scale.linear()
+function cloud() {
+  var width = 500,
+    height = 500;
+
+  function render(selection) {
+    selection.each(function(data, i) {
+      var that = this;
+      var scale = {};
+      scale.size = d3.scale.linear()
         .domain(d3.extent(data, function(d) {
           return +d.playcount;
         }))
         .range([10, 60]);
-    },
-    draw: function() {
-      var that = this;
+
       var layout = d3.layout.cloud()
-        .size([500, 500])
-        .words(this.data.map(function(d) {
-          return {text: d.artist, size: that.size(d.playcount), test: "haha"};
+        .size([width, height])
+        .words(data.map(function(d) {
+          return {text: d.artist, size: scale.size(d.playcount), test: "haha"};
         }))
         .padding(5)
         .rotate(function() { return ~~(Math.random() * 2) * 90; })
         .font("Avant Garde")
         .fontSize(function(d) { return d.size; })
-        .on("end", render);
+        .on("end", drawLayout);
 
       layout.start();
 
-      function render(words) {
-        d3.select("#lastfmContainer").append("svg")
+      function drawLayout(words) {
+        console.log(that);
+        d3.select(that).append("svg")
             .attr("width", layout.size()[0])
             .attr("height", layout.size()[1])
           .append("g")
@@ -81,11 +72,22 @@ var ArtistCloud = function() {
             })
             .text(function(d) { return d.text; });
       }
-    }
+
+    })
   }
+
+  render.width = function(value) {
+    if (!arguments.length) return width;
+    width = value;
+    return render;
+  };
+
+  render.height = function(value) {
+    if (!arguments.length) return height;
+    height = value;
+    return render;
+  };
+
+  return render;
 }
-
-
-
-
 

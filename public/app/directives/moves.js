@@ -80,7 +80,6 @@ function steps() {
           return scale.y(d);
         })
         .attr('height', function(d,i) {
-          console.log(scale.y, scale.y(d))
           return height - scale.y(d);
         })
         .attr('x', function(d,i) {
