@@ -132,8 +132,8 @@ angular.module('gestaltung.controllers', [])
     $scope.dates = {};
     $scope.dates.from = moment().add(-1, 'weeks').format('YYYYMMDD');
     $scope.dates.to = moment().format('YYYYMMDD');
-    $scope.dates.from = "20160313";
-    $scope.dates.to = "20160320";
+    $scope.dates.from = "20160301";
+    $scope.dates.to = "20160331";
     $scope.data;
 
     // Make sure requests are made in parallel
@@ -145,6 +145,7 @@ angular.module('gestaltung.controllers', [])
       $scope.data = {};
       $scope.data.lastfm = Data.lastfm(responses[0].data);
       $scope.data.moves = Data.moves(responses[1].data);
+      $scope.data.moves_2 = Data.moves_aggregate(responses[1].data);
       console.log($scope.data);
     });
   })

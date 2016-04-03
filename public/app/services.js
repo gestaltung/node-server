@@ -40,6 +40,23 @@ angular.module('gestaltung.services', [])
         })
         console.log(output);
         return output;
+      },
+      moves_aggregate: function(data) {
+        var output = [];
+        _.map(data, function(d) {
+          var w = _.find(d.summary, function(o) {
+            return o.activity === "walking";
+          });
+
+          if (w) {
+            output.push(w.steps)
+          }
+          else {
+            output.push(0);
+          }
+        })
+        console.log('output length', output.length);
+        return output;
       }
     }
   })

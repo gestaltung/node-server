@@ -20,13 +20,13 @@ angular.module('lastfm.directives', [])
           cloud.init(scope.data.lastfm);
           cloud.draw();
 
-          lastfmContainer.selectAll('p')
-            .data(scope.data.lastfm)
-            .enter()
-            .append('p')
-            .text(function(d) {
-              return d.artist + ' ' + d.playcount + 'x';
-            })
+          // lastfmContainer.selectAll('p')
+          //   .data(scope.data.lastfm)
+          //   .enter()
+          //   .append('p')
+          //   .text(function(d) {
+          //     return d.artist + ' ' + d.playcount + 'x';
+          //   })
         })
       }
     }
@@ -47,10 +47,8 @@ var ArtistCloud = function() {
           return +d.playcount;
         }))
         .range([10, 60]);
-      console.log(this.data, this.size);
     },
     draw: function() {
-      console.log(this.data, this.size);
       var that = this;
       var layout = d3.layout.cloud()
         .size([500, 500])
