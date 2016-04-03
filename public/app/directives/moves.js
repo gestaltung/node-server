@@ -66,16 +66,30 @@ function steps() {
       var scale = {};
       scale.y = d3.scale.linear()
         .domain(d3.extent(d))
-        .range(0, height);
+        .range([height, 0]);
+      var barSpacing = width/d.length;
 
-      d3.select(this).append('div')
-        .selectAll('p')
+      d3.select(this).append('svg')
+        .attr('height', height)
+        .attr('width', width)
+        .selectAll('rect')
         .data(d)
         .enter()
-        .append('p')
-        .text(function(d) {
-          return '' + d;
+        .append('rect')
+        .attr('y', function(d,i) {
+          return scale.y(d);
         })
+        .attr('height', function(d,i) {
+          console.log(scale.y, scale.y(d))
+          return height - scale.y(d);
+        })
+        .attr('x', function(d,i) {
+          return i * barSpacing;
+        })
+        .attr('width', function(d,i) {
+          return barSpacing - 5;
+        })
+        .style('fill', 'white');
 
     })
   }
