@@ -41,7 +41,7 @@ angular.module('gestaltung.services', [])
         console.log(output);
         return output;
       },
-      moves_aggregate: function(data) {
+      moves_steps: function(data) {
         var output = [];
         _.map(data, function(d) {
           var w = _.find(d.summary, function(o) {

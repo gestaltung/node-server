@@ -143,9 +143,10 @@ angular.module('gestaltung.controllers', [])
     ])
     .then(function(responses) {
       $scope.data = {};
+      $scope.data.moves = {}
       $scope.data.lastfm = Data.lastfm(responses[0].data);
-      $scope.data.moves = Data.moves(responses[1].data);
-      $scope.data.moves_2 = Data.moves_aggregate(responses[1].data);
+      $scope.data.moves.overview = Data.moves(responses[1].data);
+      $scope.data.moves.steps = Data.moves_steps(responses[1].data);
       console.log($scope.data);
     });
   })

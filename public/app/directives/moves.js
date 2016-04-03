@@ -11,10 +11,10 @@ angular.module('moves.directives', [])
           .append('div')
           .attr('id', 'movesContainer');
 
-        scope.$watch('data.moves', function(newValue, oldValue) {
+        scope.$watch('data.moves.overview', function(newValue, oldValue) {
           console.log(newValue, oldValue);
           if (newValue == oldValue) {
-            if (!scope.data) {
+            if (!scope.data.moves.overview) {
               return;
             }
           }
@@ -23,7 +23,7 @@ angular.module('moves.directives', [])
 
           // d3.select('#movesContainer').selectAll("*").remove();
           // movesContainer.selectAll('p')
-          //   .data(scope.data.moves)
+          //   .data(scope.data.moves.overview)
           //   .enter()
           //   .append('p')
           //   .text(function(d) {
@@ -38,7 +38,7 @@ angular.module('moves.directives', [])
 
         })
 
-        scope.$watch('data.moves_2', function(newValue, oldValue) {
+        scope.$watch('data.moves.steps', function(newValue, oldValue) {
           if (newValue == oldValue) {
             return;
           }
@@ -48,7 +48,7 @@ angular.module('moves.directives', [])
           var stepChart = steps().width(700);
 
           d3.select('#movesContainer')
-            .datum(scope.data.moves_2)
+            .datum(scope.data.moves.steps)
             .call(stepChart);
         })
       }
