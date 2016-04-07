@@ -118,57 +118,6 @@ passport.use(new FacebookStrategy({
   }
 }));
 
-
-// Sign in with Twitter.
-passport.use(new TwitterStrategy({
-  consumerKey: process.env.TWITTER_KEY,
-  consumerSecret: process.env.TWITTER_SECRET,
-  callbackURL: '/auth/twitter/callback',
-  passReqToCallback: true
-}, function(req, accessToken, tokenSecret, profile, done) {
-  if (req.user) {
-    User.findOne({ twitter: profile.id }, function(err, existingUser) {
-      if (existingUser) {
-        req.flash('errors', { msg: 'There is already a Twitter account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
-        done(err);
-      } else {
-        User.findById(req.user.id, function(err, user) {
-          user.twitter = profile.id;
-          user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
-          user.profile.name = user.profile.name || profile.displayName;
-          user.profile.location = user.profile.location || profile._json.location;
-          user.profile.picture = user.profile.picture || profile._json.profile_image_url_https;
-          user.save(function(err) {
-            req.flash('info', { msg: 'Twitter account has been linked.' });
-            done(err, user);
-          });
-        });
-      }
-    });
-
-  } else {
-    User.findOne({ twitter: profile.id }, function(err, existingUser) {
-      if (existingUser) {
-        return done(null, existingUser);
-      }
-      var user = new User();
-      // Twitter will not provide an email address.  Period.
-      // But a person’s twitter username is guaranteed to be unique
-      // so we can "fake" a twitter email address as follows:
-      user.email = profile.username + "@twitter.com";
-      user.twitter = profile.id;
-      user.tokens.push({ kind: 'twitter', accessToken: accessToken, tokenSecret: tokenSecret });
-      user.profile.name = profile.displayName;
-      user.profile.location = profile._json.location;
-      user.profile.picture = profile._json.profile_image_url_https;
-      user.save(function(err) {
-        done(err, user);
-      });
-    });
-  }
-}));
-
-
 /**
  * Fitbit API OAuth
  */
@@ -180,7 +129,7 @@ passport.use(new FitbitStrategy({
   },
   function(req, accessToken, refreshToken, profile, done) {
     // User is alredy logged in, so we're just linking Fitbit account
-    
+
 
     User.findById(req.user.id, function(err, user) {
       // Check it there's already a token and if there is, update it
@@ -226,54 +175,14 @@ passport.use(new MovesStrategy({
 ));
 
 /**
- * To Do: Last.fm API OAuth
- */
-// passport.use('lastfm', new OAuthStrategy({
-//     ...
-//   },
-//   function(req, accessToken, refreshToken, profile, done) {
-//     User.findById(req.user.id, function(err, user) {
-//       user.lastfm = profile.id;
-//       user.token.push({ kind: 'lastfm', accessToken: accessToken });
-//       user.save(function(err) {
-//         req.flash('info', { msg: 'Lastfm account has been linked.' });
-//         done(err, user);
-//       });
-//     });
-//   }
-// ));
-
-
-/**
- * Foursquare API OAuth.
- */
-// passport.use('foursquare', new OAuth2Strategy({
-//     authorizationURL: 'https://foursquare.com/oauth2/authorize',
-//     tokenURL: 'https://foursquare.com/oauth2/access_token',
-//     clientID: process.env.FOURSQUARE_ID,
-//     clientSecret: process.env.FOURSQUARE_SECRET,
-//     callbackURL: process.env.FOURSQUARE_REDIRECT_URL,
-//     passReqToCallback: true
-//   },
-//   function(req, accessToken, refreshToken, profile, done) {
-//     User.findById(req.user._id, function(err, user) {
-//       user.tokens.push({ kind: 'foursquare', accessToken: accessToken });
-//       user.save(function(err) {
-//         done(err, user);
-//       });
-//     });
-//   }
-// ));
-
-
-/**
  * Login Required middleware.
  */
 exports.isAuthenticated = function(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect('/login');
+  res.send(401);
+  // res.redirect('/login');
 };
 
 /**

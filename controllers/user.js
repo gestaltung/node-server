@@ -5,57 +5,23 @@ var nodemailer = require('nodemailer');
 var passport = require('passport');
 var User = require('../models/User');
 
-/**
- * GET /login
- * Login page.
- */
-exports.getLogin = function(req, res) {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  res.render('account/login', {
-    title: 'Login'
-  });
-};
-
-exports.getLink = function(req, res) {
-  if (!req.user) {
-    return res.redirect('/login');
-  }
-  else {
-    return res.render('link');
-  }
-}
-
-exports.getUpdateLastfm = function(req, res) {
-  if (!req.user) {
-    return res.redirect('/login');
-  }
-  else {
-    return res.render('linkLastfm');
-  }
-}
-
 exports.postUpdateLastfm = function(req, res) {
-  if (!req.user) {
-    return res.redirect('/login');
-  }
-  else {
-    User.findById(req.user.id, function(err, user) {
-      if (err) {
-        return next(err);
-      }
-      user.lastfm = req.body.username || '';
+  User.findById(req.user.id, function(err, user) {
+    if (err) {
+      res.json(500, err);
+    }
+    user.lastfm = req.body.username || '';
 
-      user.save(function(err) {
-        if (err) {
-          return next(err);
-        }
+    user.save(function(err) {
+      if (err) {
+        res.json(500, err);
+      }
+      else {
         req.flash('success', { msg: 'Last.fm information updated.' });
-        res.redirect('/link');
-      });
+        res.json(user);
+      }
     });
-  }
+  });
 }
 
 /**
@@ -75,18 +41,15 @@ exports.postLogin = function(req, res, next) {
 
   passport.authenticate('local', function(err, user, info) {
     if (err) {
-      return next(err);
+      return res.json(500, err);
     }
-    if (!user) {
-      req.flash('errors', { msg: info.message });
-      return res.redirect('/login');
-    }
+
     req.logIn(user, function(err) {
       if (err) {
-        return next(err);
+        return res.json(500, err);
       }
       req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      res.json(req.user);
     });
   })(req, res, next);
 };
@@ -96,21 +59,12 @@ exports.postLogin = function(req, res, next) {
  * Log out.
  */
 exports.logout = function(req, res) {
-  req.logout();
-  res.redirect('/');
-};
-
-/**
- * GET /signup
- * Signup page.
- */
-exports.getSignup = function(req, res) {
-  if (req.user) {
-    return res.redirect('/');
+  if(req.user) {
+    req.logout();
+    res.send(200);
+  } else {
+    res.send(400, "Not logged in");
   }
-  res.render('account/signup', {
-    title: 'Create Account'
-  });
 };
 
 /**
@@ -137,7 +91,7 @@ exports.postSignup = function(req, res, next) {
   User.findOne({ email: req.body.email }, function(err, existingUser) {
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/signup');
+      return res.json(500, err)
     }
     user.save(function(err) {
       if (err) {
@@ -147,7 +101,7 @@ exports.postSignup = function(req, res, next) {
         if (err) {
           return next(err);
         }
-        res.redirect('/');
+        res.json(200);
       });
     });
   });

@@ -32,15 +32,16 @@ dotenv.load({ path: '.env' });
  * Controllers (route handlers).
  */
 var summaryController = require('./controllers/summary');
-var homeController = require('./controllers/home');
 var signupController = require('./controllers/signup');
+var sessionController = require('./controllers/sessions');
+var authController = require('./controllers/auth');
 var userController = require('./controllers/user');
+var homeController = require('./controllers/home');
 var apiController = require('./controllers/api');
 var movesController = require('./controllers/moves');
 var authenticationController = require('./controllers/authentication');
 var fitbitController = require('./controllers/fitbit');
 var lastfmController = require('./controllers/lastfm');
-var thermalController = require('./controllers/thermal');
 var contactController = require('./controllers/contact');
 var dashboardController = require('./controllers/dashboard');
 
@@ -82,35 +83,9 @@ mongoose.connection.on('error', function() {
 });
 
 /**
- * Setup thermal printer
- */
-var Printer = require('thermalprinter');
-var serialPort = require("serialport");
-var SerialPort = serialPort.SerialPort;
-
-serialPort.list(function (err, ports) {
-  ports.forEach(function(port) {
-    // if our device is connected, open serial port communication.
-    if (port.comName === process.envSERIALPORT) {
-      exports.serialPort = new SerialPort(process.env.SERIALPORT, {
-         baudrate: process.env.BAUDRATE
-      });
-
-      exports.printer = new Printer(exports.serialPort);
-    }
-    else {
-      console.log('no thermal printer connected');
-    }
-  });
-});
-
-
-/**
  * Express configuration.
  */
 app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 app.use(compress());
 app.use(sass({
   src: path.join(__dirname, 'public'),
@@ -139,7 +114,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use(lusca({
-  // csrf: true,
   csrf: false,
   xframe: 'SAMEORIGIN',
   xssProtection: true
@@ -156,29 +130,33 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
+// Define a middleware function to be used for every secured routes
+var auth = function(req, res, next) {
+  if (!req.isAuthenticated()) {
+    res.send(401);
+  }
+  else {
+    next();
+  }
+};
+
 
 /**
  * Primary app routes.
  */
-app.get('/landing', signupController.index);
-app.get('/', homeController.index, passportConf.isAuthenticated);
+app.get('/', homeController.index);
 app.post('/express_interest', signupController.postSubmitEmail);
-app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
 
 /**
  * Account-related routes
  */
-app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
 app.get('/reset/:token', userController.getReset);
 app.post('/reset/:token', userController.postReset);
-app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
-app.get('/contact', contactController.getContact);
 app.post('/contact', contactController.postContact);
-app.get('/account', passportConf.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
@@ -187,15 +165,12 @@ app.get('/account/unlink/:provider', passportConf.isAuthenticated, userControlle
 /**
  * Routes for linking accounts
  */
-app.get('/link', passportConf.isAuthenticated, userController.getLink);
-app.get('/link/lastfm', passportConf.isAuthenticated, userController.getUpdateLastfm);
 app.post('/link/lastfm', passportConf.isAuthenticated, userController.postUpdateLastfm);
 
 /**
  * Dashboard routes
  */
-app.get('/dashboard', passportConf.isAuthenticated, dashboardController.getDailyDashboard);
-app.get('/dashboard/custom', passportConf.isAuthenticated, dashboardController.getCustomDashboard);
+
 
 /**
  * Authentication for other devices
@@ -210,25 +185,15 @@ app.get('/test', passportConf.isAuthenticated, apiController.getApiTests);
 /**
  * API examples routes.
  */
-app.get('/api', apiController.getApi);
 app.get('/api/docs', apiController.getDocs);
 app.get('/api/summary/daily', summaryController.getDailySummary);
-// app.get('/api/lastfm/getRecentTracks', summaryController.getRecentTracks);
 app.get('/api/lastfm/artists', lastfmController.getTopArtists);
-// app.get('/api/lastfm', summaryController.getLastfm);
-// app.get('/api/twilio', apiController.getTwilio);
-// app.post('/api/twilio', apiController.postTwilio);
-app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
-// app.get('/api/tumblr', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTumblr);
-// app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
-// app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
-// app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
+
 
 /**
  * Fitbit-Specific Routes.
  */
 app.get('/api/fitbit/sleep', fitbitController.getSleepSummary);
-// app.get('/api/fitbit/activity', fitbitController.getActivitySummary);
 app.get('/api/fitbit/refresh', fitbitController.getFitbitRefreshToken);
 app.get('/api/fitbit/profile', fitbitController.getFitbitProfile);
 
@@ -240,25 +205,13 @@ app.get('/api/moves/profile', passportConf.isAuthenticated, movesController.getM
 app.get('/api/moves/summary', movesController.getSummaryByDateRange);
 
 /**
- * Thermal printer & Serial communications with Arduino
- */
-app.post('/api/thermal', thermalController.printSummary);
-app.get('/api/blinkLED', thermalController.blinkLED);
-
-/**
  * OAuth authentication routes. (Sign in)
+ * and Session routes
  */
+app.get('/auth/session', passportConf.isAuthenticated, sessionController.session);
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
-app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), function(req, res) {
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), function(req, res) {
   res.redirect('/');
-});
-app.get('/auth/google', passport.authenticate('google', { scope: 'profile email' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
-app.get('/auth/twitter', passport.authenticate('twitter'));
-app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
 });
 
 /**
@@ -277,15 +230,6 @@ app.get('/auth/moves/callback', passport.authenticate('moves', { failureRedirect
  res.redirect('/');
 });
 
-app.get('/auth/lastfm', passport.authenticate('lastfm'));
-app.get('/auth/lastfm/callback', passport.authenticate('moves', { failureRedirect: '/link' }), function(req, res) {
-  res.redirect('/');
-});
-
-app.get('/auth/foursquare', passport.authorize('foursquare'));
-app.get('/auth/foursquare/callback', passport.authorize('foursquare', { failureRedirect: '/api' }), function(req, res) {
-  res.redirect('/api/foursquare');
-});
 
 /**
  * Error Handler.
