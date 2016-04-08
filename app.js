@@ -146,16 +146,13 @@ var auth = function(req, res, next) {
  */
 app.get('/', homeController.index);
 app.post('/express_interest', signupController.postSubmitEmail);
-app.post('/login', userController.postLogin);
-app.get('/logout', userController.logout);
 
 /**
  * Account-related routes
  */
 app.post('/forgot', userController.postForgot);
-app.get('/reset/:token', userController.getReset);
-app.post('/reset/:token', userController.postReset);
-app.post('/signup', userController.postSignup);
+// app.get('/reset/:token', userController.getReset);
+// app.post('/reset/:token', userController.postReset);
 app.post('/contact', contactController.postContact);
 app.post('/account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
@@ -208,6 +205,9 @@ app.get('/api/moves/summary', movesController.getSummaryByDateRange);
  * OAuth authentication routes. (Sign in)
  * and Session routes
  */
+app.post('/auth/signup', userController.postSignup);
+app.post('/auth/session', userController.postLogin);
+app.del('/auth/session', userController.logout);
 app.get('/auth/session', passportConf.isAuthenticated, sessionController.session);
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), function(req, res) {

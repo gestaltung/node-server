@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('gestaltung')
-  .factory('Auth', function Auth($location, $rootScope, Session, User, $cookieStore) {
+  .factory('Auth', function Auth($location, $rootScope, User, Session, $cookieStore) {
     $rootScope.currentUser = $cookieStore.get('user') || null;
     $cookieStore.remove('user');
 
@@ -43,6 +43,22 @@ angular.module('gestaltung')
           function(err) {
             return cb(err.data);
           });
+      },
+
+      facebookLogin: function() {
+        // FB.login(function(response) {
+          // FB.api('/me', function(profile) {
+            // var data = {
+              // signedRequest: response.authResponse.signedRequest,
+              // profile: profile
+            // };
+        $http.get('/auth/facebook').success(function(user) {
+          $rootScope.currentUser = user;
+          console.log(user);
+          $location.path('/');
+        });
+          // });
+        // }, { scope: 'email, public_profile' });
       },
 
       currentUser: function() {

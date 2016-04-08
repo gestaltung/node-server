@@ -2,5 +2,5 @@
 
 angular.module('gestaltung')
   .factory('Session', function ($resource) {
-    return $resource('/auth/session/');
+    return $resource('/auth/session');
   });

@@ -1,46 +1,46 @@
 'use strict';
 
-angular.module('gestaltung', ['ngRoute', 'gestaltung.directives', 'lastfm.directives', 'moves.directives', 'gestaltung.services', 'gestaltung.controllers'])
+angular.module('gestaltung', ['ngRoute', 'ngResource', 'ngCookies', 'http-auth-interceptor', 'gestaltung.directives', 'lastfm.directives', 'moves.directives', 'gestaltung.services', 'gestaltung.controllers'])
   .config(function($routeProvider, $locationProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: 'partials/main.html',
+        templateUrl: 'views/partials/main.html',
         controller: 'MainCtrl'
       })
       .when('/account', {
-        templateUrl: 'partials/account.html',
+        templateUrl: 'views/partials/account.html',
         controller: 'AccountCtrl'
       })
       .when('/login', {
-        templateUrl: 'partials/login.html',
+        templateUrl: 'views/partials/login.html',
         controller: 'LoginCtrl'
       })
       .when('/signup', {
-        templateUrl: 'partials/signup.html',
+        templateUrl: 'views/partials/signup.html',
         controller: 'SignupCtrl'
       })
       .when('/account/settings', {
-        templateUrl: 'partials/settings.html',
+        templateUrl: 'views/partials/settings.html',
         controller: 'AccountCtrl'
       })
       .when('/account/link', {
-        templateUrl: 'partials/link.html',
+        templateUrl: 'views/partials/link.html',
         controller: 'AccountCtrl'
       })
       .when('/account/link/phone', {
-        templateUrl: 'partials/link/phone.html',
+        templateUrl: 'views/partials/link/phone.html',
         controller: 'AccountCtrl'
       })
       .when('/account/link/lastfm', {
-        templateUrl: 'partials/link/lastfm.html',
+        templateUrl: 'views/partials/link/lastfm.html',
         controller: 'AccountCtrl'
       })
       .when('/dashboard', {
-        templateUrl: 'partials/dashboard.html',
+        templateUrl: 'views/partials/dashboard.html',
         controller: 'DashboardCtrl'
       })
       .when('/dashboard/custom', {
-        templateUrl: 'partials/dashboard_custom.html',
+        templateUrl: 'views/partials/dashboard_custom.html',
         controller: 'DashboardCtrl'
       })
       .otherwise({

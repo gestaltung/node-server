@@ -24,6 +24,9 @@
     "moment": "^2.11.2",
     "three.js": "threejs#*",
     "angular-ui-router": "^0.2.18",
-    "d3-cloud": "^1.2.1"
+    "d3-cloud": "^1.2.1",
+    "angular-http-auth": "^1.3.0",
+    "angular-resource": "^1.5.3",
+    "angular-cookies": "^1.5.3"
   }
 }

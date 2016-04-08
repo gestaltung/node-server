@@ -80,7 +80,7 @@ exports.postSignup = function(req, res, next) {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/signup');
+    res.status(500).json(errors);
   }
 
   var user = new User({
@@ -91,29 +91,19 @@ exports.postSignup = function(req, res, next) {
   User.findOne({ email: req.body.email }, function(err, existingUser) {
     if (existingUser) {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.json(500, err)
+      res.status(500).json(errors);
     }
     user.save(function(err) {
       if (err) {
-        return next(err);
+        res.status(500).json(errors);
       }
       req.logIn(user, function(err) {
         if (err) {
-          return next(err);
+          res.status(500).json(errors);
         }
-        res.json(200);
+        res.json(200, user);
       });
     });
-  });
-};
-
-/**
- * GET /account
- * Profile page.
- */
-exports.getAccount = function(req, res) {
-  res.render('account/profile', {
-    title: 'Account Management'
   });
 };
 
@@ -124,7 +114,7 @@ exports.getAccount = function(req, res) {
 exports.postUpdateProfile = function(req, res, next) {
   User.findById(req.user.id, function(err, user) {
     if (err) {
-      return next(err);
+      return res.json(500, err);
     }
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
@@ -133,10 +123,10 @@ exports.postUpdateProfile = function(req, res, next) {
     user.profile.website = req.body.website || '';
     user.save(function(err) {
       if (err) {
-        return next(err);
+        return res.json(500, err);
       }
       req.flash('success', { msg: 'Profile information updated.' });
-      res.redirect('/account');
+      res.json(200, user);
     });
   });
 };
@@ -153,20 +143,20 @@ exports.postUpdatePassword = function(req, res, next) {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/account');
+    res.json(500, errors);
   }
 
   User.findById(req.user.id, function(err, user) {
     if (err) {
-      return next(err);
+      res.json(500, err);
     }
     user.password = req.body.password;
     user.save(function(err) {
       if (err) {
-        return next(err);
+        res.json(500, err);
       }
       req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
+      res.json(200, user);
     });
   });
 };
@@ -178,11 +168,11 @@ exports.postUpdatePassword = function(req, res, next) {
 exports.postDeleteAccount = function(req, res, next) {
   User.remove({ _id: req.user.id }, function(err) {
     if (err) {
-      return next(err);
+      res.json(500, err);
     }
     req.logout();
     req.flash('info', { msg: 'Your account has been deleted.' });
-    res.redirect('/');
+    res.json(200);
   });
 };
 
@@ -194,14 +184,16 @@ exports.getOauthUnlink = function(req, res, next) {
   var provider = req.params.provider;
   User.findById(req.user.id, function(err, user) {
     if (err) {
-      return next(err);
+      res.json(500, err);
     }
     user[provider] = undefined;
     user.tokens = _.reject(user.tokens, function(token) { return token.kind === provider; });
     user.save(function(err) {
-      if (err) return next(err);
+      if (err) {
+        res.json(500, err);
+      }
       req.flash('info', { msg: provider + ' account has been unlinked.' });
-      res.redirect('/account');
+      res.json(200);
     });
   });
 };
@@ -210,108 +202,108 @@ exports.getOauthUnlink = function(req, res, next) {
  * GET /reset/:token
  * Reset Password page.
  */
-exports.getReset = function(req, res) {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  User
-    .findOne({ resetPasswordToken: req.params.token })
-    .where('resetPasswordExpires').gt(Date.now())
-    .exec(function(err, user) {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-        return res.redirect('/forgot');
-      }
-      res.render('account/reset', {
-        title: 'Password Reset'
-      });
-    });
-};
+// exports.getReset = function(req, res) {
+//   if (req.isAuthenticated()) {
+//     return res.redirect('/');
+//   }
+//   User
+//     .findOne({ resetPasswordToken: req.params.token })
+//     .where('resetPasswordExpires').gt(Date.now())
+//     .exec(function(err, user) {
+//       if (err) {
+//         return next(err);
+//       }
+//       if (!user) {
+//         req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+//         return res.redirect('/forgot');
+//       }
+//       res.render('account/reset', {
+//         title: 'Password Reset'
+//       });
+//     });
+// };
 
 /**
  * POST /reset/:token
  * Process the reset password request.
  */
-exports.postReset = function(req, res, next) {
-  req.assert('password', 'Password must be at least 4 characters long.').len(4);
-  req.assert('confirm', 'Passwords must match.').equals(req.body.password);
+// exports.postReset = function(req, res, next) {
+//   req.assert('password', 'Password must be at least 4 characters long.').len(4);
+//   req.assert('confirm', 'Passwords must match.').equals(req.body.password);
 
-  var errors = req.validationErrors();
+//   var errors = req.validationErrors();
 
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('back');
-  }
+//   if (errors) {
+//     req.flash('errors', errors);
+//     return res.redirect('back');
+//   }
 
-  async.waterfall([
-    function(done) {
-      User
-        .findOne({ resetPasswordToken: req.params.token })
-        .where('resetPasswordExpires').gt(Date.now())
-        .exec(function(err, user) {
-          if (err) {
-            return next(err);
-          }
-          if (!user) {
-            req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-            return res.redirect('back');
-          }
-          user.password = req.body.password;
-          user.resetPasswordToken = undefined;
-          user.resetPasswordExpires = undefined;
-          user.save(function(err) {
-            if (err) {
-              return next(err);
-            }
-            req.logIn(user, function(err) {
-              done(err, user);
-            });
-          });
-        });
-    },
-    function(user, done) {
-      var transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: process.env.SENDGRID_USER,
-          pass: process.env.SENDGRID_PASSWORD
-        }
-      });
-      var mailOptions = {
-        to: user.email,
-        from: 'hackathon@starter.com',
-        subject: 'Your Hackathon Starter password has been changed',
-        text: 'Hello,\n\n' +
-          'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-      };
-      transporter.sendMail(mailOptions, function(err) {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });
-        done(err);
-      });
-    }
-  ], function(err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect('/');
-  });
-};
+//   async.waterfall([
+//     function(done) {
+//       User
+//         .findOne({ resetPasswordToken: req.params.token })
+//         .where('resetPasswordExpires').gt(Date.now())
+//         .exec(function(err, user) {
+//           if (err) {
+//             return next(err);
+//           }
+//           if (!user) {
+//             req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+//             return res.redirect('back');
+//           }
+//           user.password = req.body.password;
+//           user.resetPasswordToken = undefined;
+//           user.resetPasswordExpires = undefined;
+//           user.save(function(err) {
+//             if (err) {
+//               return next(err);
+//             }
+//             req.logIn(user, function(err) {
+//               done(err, user);
+//             });
+//           });
+//         });
+//     },
+//     function(user, done) {
+//       var transporter = nodemailer.createTransport({
+//         service: 'SendGrid',
+//         auth: {
+//           user: process.env.SENDGRID_USER,
+//           pass: process.env.SENDGRID_PASSWORD
+//         }
+//       });
+//       var mailOptions = {
+//         to: user.email,
+//         from: 'hackathon@starter.com',
+//         subject: 'Your Hackathon Starter password has been changed',
+//         text: 'Hello,\n\n' +
+//           'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+//       };
+//       transporter.sendMail(mailOptions, function(err) {
+//         req.flash('success', { msg: 'Success! Your password has been changed.' });
+//         done(err);
+//       });
+//     }
+//   ], function(err) {
+//     if (err) {
+//       return next(err);
+//     }
+//     res.redirect('/');
+//   });
+// };
 
 /**
  * GET /forgot
  * Forgot Password page.
  */
-exports.getForgot = function(req, res) {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  res.render('account/forgot', {
-    title: 'Forgot Password'
-  });
-};
+// exports.getForgot = function(req, res) {
+//   if (req.isAuthenticated()) {
+//     return res.redirect('/');
+//   }
+//   res.render('account/forgot', {
+//     title: 'Forgot Password'
+//   });
+// };
 
 /**
  * POST /forgot
@@ -324,7 +316,7 @@ exports.postForgot = function(req, res, next) {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/forgot');
+    res.json(500, err);
   }
 
   async.waterfall([
@@ -371,8 +363,8 @@ exports.postForgot = function(req, res, next) {
     }
   ], function(err) {
     if (err) {
-      return next(err);
+      res.json(500, err);
     }
-    res.redirect('/forgot');
+    res.json(200);
   });
 };
