@@ -13,6 +13,8 @@ var userSchema = new mongoose.Schema({
   twitter: String,
   google: String,
   github: String,
+  thermal_url: String,
+  telephone: String,
   instagram: String,
   linkedin: String,
   steam: String,

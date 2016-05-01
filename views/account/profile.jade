@@ -17,6 +17,14 @@ block content
         .col-sm-7
           input.form-control(type='text', name='name', id='name', value='#{user.profile.name}')
       .form-group
+        label.col-sm-3.control-label(for='telephone') Telephone
+        .col-sm-7
+          input.form-control(type='text', name='telephone', id='telephone', value='#{user.profile.telephone}')
+      .form-group
+        label.col-sm-3.control-label(for='name') Thermal Printer URL
+        .col-sm-7
+          input.form-control(type='text', name='thermal_url', id='thermal_url', value='#{user.profile.thermal_url}')
+      .form-group
         label.col-sm-3.control-label(for='location') Location
         .col-sm-7
           input.form-control(type='text', name='location', id='location', value='#{user.profile.location}')

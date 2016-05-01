@@ -16,7 +16,20 @@ exports.getDailySummary = function(req, res, next) {
   // The last day will always be yesterday.
   request = require('request');
   moment = require('moment');
-  var token = _.find(req.user.tokens, { kind: 'moves' });
+
+  // If request is made from CLI utility, token will be appended
+  var token;
+  try {
+    token = _.find(req.user.tokens, { kind: 'moves' });
+  }
+  catch(e) {
+    console.log(req.query.token)
+  }
+
+  if(!token) {
+    token = {};
+    token.accessToken = req.query.token;
+  }
 
   // Date stuff
   var date;

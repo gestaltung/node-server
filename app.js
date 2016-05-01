@@ -34,6 +34,7 @@ dotenv.load({ path: '.env' });
 var summaryController = require('./controllers/summary');
 var homeController = require('./controllers/home');
 var signupController = require('./controllers/signup');
+var twilioController = require('./controllers/twilio');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var movesController = require('./controllers/moves');
@@ -219,10 +220,7 @@ app.get('/api/lastfm/artists', lastfmController.getTopArtists);
 // app.get('/api/twilio', apiController.getTwilio);
 // app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/foursquare', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFoursquare);
-// app.get('/api/tumblr', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTumblr);
-// app.get('/api/facebook', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getFacebook);
-// app.get('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.getTwitter);
-// app.post('/api/twitter', passportConf.isAuthenticated, passportConf.isAuthorized, apiController.postTwitter);
+app.get('/api/twilio/printer', twilioController.smsToPrinter);
 
 /**
  * Fitbit-Specific Routes.
@@ -238,6 +236,7 @@ app.get('/api/fitbit/profile', fitbitController.getFitbitProfile);
 app.get('/api/moves/distance', movesController.getAggregatedDistance);
 app.get('/api/moves/profile', passportConf.isAuthenticated, movesController.getMovesProfile);
 app.get('/api/moves/summary', movesController.getSummaryByDateRange);
+app.get('/api/moves/places', movesController.getPlacesByDateRange);
 
 /**
  * Thermal printer & Serial communications with Arduino

@@ -68,7 +68,8 @@ exports.getAggregatedDistance = function(req, res) {
 		userID = req.user.moves;
 	}
 	catch(err) {
-    res.status(400).send(err);
+    // OpenFrameworks won't have tokens in request.
+    console.log('Request made from OF');
 	}
 
 
@@ -160,6 +161,7 @@ exports.getAggregatedDistance = function(req, res) {
  * Returns activity summary for specified date range
  *
  * TO DO: Make sure end date of range isn't in the future
+ * Can abstract date ranges into middleware
  */
 exports.getSummaryByDateRange = function(req, res) {
   request = require('request');
@@ -218,7 +220,71 @@ exports.getSummaryByDateRange = function(req, res) {
   // res.send({});
 }
 
+/**
+ * GET /api/moves/places
+ *
+ * @param {start date} [from] [in YYYYMMDD format]
+ * @param {end date} [to] [in YYYYMMDD format]
+ * @param {date date} [date] [YYYYMMDD — Optional]
+ *
+ * Returns places summary for specified date range
+ *
+ * TO DO: Make sure end date of range isn't in the future
+ */
+exports.getPlacesByDateRange = function(req, res) {
+  request = require('request');
 
+  var baseUrl = 'https://api.moves-app.com/api/1.1/user/places/daily';
+
+  var token, userID, range, startDate, url, from, to, date;
+  var query;
+
+  // OpenFrameworks won't have tokens in request.
+  // Instead it will be hardcoded in the request.
+  try {
+    token = _.find(req.user.tokens, { kind: 'moves' });
+    userID = req.user.moves;
+  }
+  catch(err) {
+    res.status(400).send(err);
+  }
+
+  if (req.query.from && req.query.to) {
+    from = req.query.from;
+    to = req.query.to;
+    query = querystring.stringify({
+      'from': from,
+      'to': to,
+      'access_token': req.query.access_token || token.accessToken
+    });
+  }
+  else if(req.query.date) {
+    date = req.query.date;
+    query = querystring.stringify({
+      'access_token': req.query.access_token || token.accessToken
+    });
+  }
+  else {
+    res.status(400).send({
+      'status': 'err',
+      'msg': 'Start and/or end date not provided'
+    });
+  }
+
+  console.log('reached here');
+
+  url = baseUrl + '?' + query;
+  console.log(url);
+  request.get(url, function(err, request, body) {
+    if (err) {
+      res.send(err);
+    }
+
+    var data = JSON.parse(body);
+
+    return res.json(data);
+  })
+}
 
 
 

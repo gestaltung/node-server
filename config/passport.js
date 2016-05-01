@@ -6,8 +6,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
 var MovesStrategy = require('passport-moves').Strategy;
 var OpenIDStrategy = require('passport-openid').Strategy;
@@ -180,7 +178,7 @@ passport.use(new FitbitStrategy({
   },
   function(req, accessToken, refreshToken, profile, done) {
     // User is alredy logged in, so we're just linking Fitbit account
-    
+
 
     User.findById(req.user.id, function(err, user) {
       // Check it there's already a token and if there is, update it
