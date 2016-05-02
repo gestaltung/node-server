@@ -3,15 +3,13 @@
  * Main dashboard page.
  */
 exports.getDailyDashboard = function(req, res) {
-  res.render('dashboard', {
+  res.status(200).render('dashboard', {
     title: 'Daily Dashboard View'
   });
 };
 
 exports.getCustomDashboard = function(req, res) {
-  res.render('dashboard-custom', {
+  res.status(200).render('dashboard-custom', {
     title: 'Custom Range Dashboard View'
   });
 };
-
-// To do: Maybe make a POST route for some 3D stuff rendered in the back-end

@@ -13,26 +13,26 @@ exports.getLogin = function(req, res) {
   if (req.user) {
     return res.redirect('/');
   }
-  res.render('account/login', {
+  res.status(200).render('account/login', {
     title: 'Login'
   });
 };
 
 exports.getLink = function(req, res) {
   if (!req.user) {
-    return res.redirect('/login');
+    return res.status(200).redirect('/login');
   }
   else {
-    return res.render('link');
+    return res.status(200).render('link');
   }
 }
 
 exports.getUpdateLastfm = function(req, res) {
   if (!req.user) {
-    return res.redirect('/login');
+    return res.status(200).redirect('/login');
   }
   else {
-    return res.render('linkLastfm');
+    return res.status(200).render('linkLastfm');
   }
 }
 
@@ -260,7 +260,7 @@ exports.getOauthUnlink = function(req, res, next) {
  */
 exports.getReset = function(req, res) {
   if (req.isAuthenticated()) {
-    return res.redirect('/');
+    return res.status(200).redirect('/');
   }
   User
     .findOne({ resetPasswordToken: req.params.token })
@@ -271,9 +271,9 @@ exports.getReset = function(req, res) {
       }
       if (!user) {
         req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-        return res.redirect('/forgot');
+        return res.status(200).redirect('/forgot');
       }
-      res.render('account/reset', {
+      res.status(200).render('account/reset', {
         title: 'Password Reset'
       });
     });
@@ -354,9 +354,9 @@ exports.postReset = function(req, res, next) {
  */
 exports.getForgot = function(req, res) {
   if (req.isAuthenticated()) {
-    return res.redirect('/');
+    return res.status(200).redirect('/');
   }
-  res.render('account/forgot', {
+  res.status(200).render('account/forgot', {
     title: 'Forgot Password'
   });
 };

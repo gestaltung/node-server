@@ -9,27 +9,19 @@ block content
     .copy
       p A framework for the physicalization of personal data.
     if user
-      .row
-        .col-sm-6
-          a.btn(href="/dashboard")
-            h2 Dashboard (Daily)
-        .col-sm-6
-          a.btn(href="/dashboard/custom")
-            h2 Dashboard (Custom)
-      .row
-        .login-options.text-center
-          .col-sm-3
-            a.btn(href="/link")
-              h2 Link Apps
-          .col-sm-3
-            a.btn(href="/account")
-              h2 Account
+      .row.home-options
+        a.btn(href="/dashboard")
+          | Dashboard (Daily)
+        a.btn(href="/dashboard/custom")
+          | Dashboard (Custom)
+        a.btn(href="/link")
+          | Link Apps
+        a.btn(href="/account")
+          | Account
 
     else
       .login-options.text-center
-        .col-sm-offset-3.col-sm-3
-          a.btn(href="/login")
-            h2 Log In 
-        .col-sm-3
-          a.btn(href="/signup")
-            h2 Sign Up 
+        a.btn(href="/login")
+          | Log In 
+        a.btn(href="/signup")
+          | Sign Up 
