@@ -57,6 +57,26 @@ angular.module('gestaltung.services', [])
         })
         console.log('output length', output.length);
         return output;
+      },
+      extract_places: function(data) {
+        // Extract places from moves storyline
+        var output = {};
+
+        var trackPoints = [];
+        var places = [];
+        for (var m in data.movesStoryline) {
+          var move = data.movesStoryline[m];
+          if (move.type === "move") {
+            trackPoints.push(move.trackPoints);
+          }
+          else if (move.type === "place") {
+            places.push(move);
+          }
+        }
+
+        output.trackPoints = _.flatten(trackPoints);
+        output.places = places;
+        return output;
       }
     }
   })

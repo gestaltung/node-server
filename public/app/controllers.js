@@ -2,7 +2,7 @@
 
 /* Controller */
 angular.module('gestaltung.controllers', [])
-	.controller('DailyDashboardCtrl', function($scope, $http, $q, $timeout, $interval) {
+	.controller('DailyDashboardCtrl', function($scope, $http, $q, Data, $timeout, $interval) {
 		console.log('DailyDashboardCtrl instantiated');
 		// 1 sec is 5 minutes
 		var timeFactor = 5;
@@ -102,26 +102,29 @@ angular.module('gestaltung.controllers', [])
         console.log(responses[0],responses[1]);
         $scope.data = responses[0].data;
         $scope.summary = responses[1].data;
-        extractPlaces(responses[0].data);
+
+        var places = Data.extract_places(responses[0].data);
+        $scope.trackPoints = places.trackPoints;
+        $scope.places = places.places;
       });
     }
 
-    function extractPlaces(data) {
-      var trackPoints = [];
-      var places = [];
-      for (var m in data.movesStoryline) {
-        var move = data.movesStoryline[m];
-        if (move.type === "move") {
-          trackPoints.push(move.trackPoints);
-        }
-        else if (move.type === "place") {
-          places.push(move);
-        }
-      }
+    // function extractPlaces(data) {
+    //   var trackPoints = [];
+    //   var places = [];
+    //   for (var m in data.movesStoryline) {
+    //     var move = data.movesStoryline[m];
+    //     if (move.type === "move") {
+    //       trackPoints.push(move.trackPoints);
+    //     }
+    //     else if (move.type === "place") {
+    //       places.push(move);
+    //     }
+    //   }
 
-      $scope.trackPoints = _.flatten(trackPoints);
-      $scope.places = places;
-    }
+    //   $scope.trackPoints = _.flatten(trackPoints);
+    //   $scope.places = places;
+    // }
 
 		// function getDailySummary(date) {
 		// 	console.log('date', date);
