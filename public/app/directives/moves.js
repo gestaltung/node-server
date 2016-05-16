@@ -11,13 +11,13 @@ angular.module('moves.directives', [])
           .append('div')
           .attr('id', 'movesContainer');
 
-        scope.$watch('data.moves.overview', function(newValue, oldValue) {
-          console.log(newValue, oldValue);
-          if (newValue == oldValue) {
-            if (!scope.data.moves.overview) {
-              return;
-            }
-          }
+        // scope.$watch('data.moves.overview', function(newValue, oldValue) {
+          // console.log(newValue, oldValue);
+          // if (newValue == oldValue) {
+            // if (!scope.data.moves.overview) {
+            //   return;
+            // }
+          // }
 
           // if (scope.data.moves.aggregate) blablabla
 
@@ -36,7 +36,7 @@ angular.module('moves.directives', [])
           // })
 
 
-        })
+        // })
 
         scope.$watch('data.moves.steps', function(newValue, oldValue) {
           if (newValue == oldValue) {
@@ -50,6 +50,14 @@ angular.module('moves.directives', [])
           d3.select('#movesContainer')
             .datum(scope.data.moves.steps)
             .call(stepChart);
+        })
+
+        scope.$watch('data.moves.overview', function(newValue, oldValue) {
+          if (newValue == oldValue) {
+            return;
+          }
+
+          console.log('overview', scope.data.moves.overview);
         })
       }
     }

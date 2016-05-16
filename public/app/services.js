@@ -11,6 +11,7 @@ angular.module('gestaltung.services', [])
         return data;
       },
       moves: function(data) {
+        // Distance covered per activity
         console.log(data);
         var all = [];
         var output = [];
@@ -42,6 +43,7 @@ angular.module('gestaltung.services', [])
         return output;
       },
       moves_steps: function(data) {
+        // Total Steps per day for date range
         var output = [];
         _.map(data, function(d) {
           var w = _.find(d.summary, function(o) {

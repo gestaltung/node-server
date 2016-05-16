@@ -178,7 +178,8 @@ exports.getSummaryByDateRange = function(req, res) {
     userID = req.user.moves;
   }
   catch(err) {
-    res.status(400).send(err);
+    token = req.query.access_token;
+    // res.status(400).send(err);
   }
 
   if (req.query.from && req.query.to) {
