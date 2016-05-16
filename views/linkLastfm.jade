@@ -1,17 +1,18 @@
 extends layout
 
 block content
-	.page-header
-		h3 Last.fm Information
+  include partials/header
+  #homepage
+    .page-header
+      h3 Link Last.fm
 
-	form.form-horizontal(action='/link/lastfm', method='POST')
-		input(type='hidden', name='_csrf', value=_csrf)
-		.form-group
-			label.col-sm-3.control-label(for='username') Username
-			.col-sm-7
-				input.form-control(type='text', name='username', id='username', value='#{user.lastfm || ""}')
-		.form-group
-			.col-sm-offset-3.col-sm-4
-				button.btn.btn.btn-primary(type='submit')
-					i.fa.fa-pencilr
-					| Update Last.fm Profile
+    form.form-horizontal(action='/link/lastfm', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        .col-sm-7
+          input.form-control(type='text', name='username', placeholder='Last.fm User Name', id='username', value='#{user.lastfm || ""}')
+      .form-group
+        .col-sm-4
+          button.btn.btn.btn-primary(type='submit')
+            i.fa.fa-pencilr
+            | Update Last.fm Profile

@@ -4,23 +4,20 @@ block content
   script(src='/bower_components/moment/moment.js')
   script(src='/bower_components/d3/d3.js')
   script(src='/bower_components/lodash/dist/lodash.js')
-  .row#dashboard
+  .dashboard-container
     //- .row
-    //-   include partials/header
-    div(ng-controller='DailyDashboardCtrl')
+    include partials/header
+    div(ng-controller='DailyDashboardCtrl')#dashboard
       .row
         a(ng-href="dashboard/custom")
-            h5 Custom View
+          h5 Custom View
       .row
-        div.col-sm-8.date-picker(ng-if="date" class="text-center")
+        div.date-picker(ng-if="date")
           a(class="fa fa-chevron-left" ng-click="removeDate()")
           {{date.format('DD/MM/YYYY')}}&nbsp
           a(class="fa fa-chevron-right" ng-click="addDate()")
-        div.col-sm-4
-          a.btn(ng-click="printSummary()")
-            h5 Print Summary
       .row
         div.col-sm-8(user-dashboard)
-        div.col-sm-2(artist-cloud)
         div.col-sm-2(places-summary)
+        //- div.col-sm-2(artist-cloud)
       //- div(user-reflection)

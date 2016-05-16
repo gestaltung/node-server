@@ -11957,7 +11957,7 @@ h1 {
   text-decoration: underline;
 }
 
-#dashboard {
+.dashboard-container {
   min-height: 100%;
   padding-top: 5%;
   background: #0a0a0a;
@@ -11965,14 +11965,18 @@ h1 {
   font-family: 'Avant Garde';
 }
 
-#dashboard .nav-serif {
-  font-family: 'Copernicus';
-  font-style: italic;
+.dashboard-container .date-picker {
+  font-size: 30px;
+  margin: 5px 0px 30px 0px;
 }
 
-#dashboard .date-picker {
-  font-size: 30px;
-  margin: 30px 0px 30px 0px;
+.dashboard-container a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+#dashboard {
+  margin: 2% 5% 0% 5%;
 }
 
 textarea {
