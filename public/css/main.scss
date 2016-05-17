@@ -147,7 +147,13 @@ h1 {
     }
   }
 
-  & #placesContainer {
+  & #sleepContainer {
+    h1 {
+      margin-bottom: 30px;
+    }
+  }
+
+  & #placesContainer, #sleepContainer {
     h1 {
       margin-top: 0px;
     }

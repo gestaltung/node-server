@@ -11979,7 +11979,11 @@ h1 {
   font-size: 135%;
 }
 
-.dashboard-container #placesContainer h1 {
+.dashboard-container #sleepContainer h1 {
+  margin-bottom: 30px;
+}
+
+.dashboard-container #placesContainer h1, .dashboard-container #sleepContainer h1 {
   margin-top: 0px;
 }
 
