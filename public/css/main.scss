@@ -140,6 +140,18 @@ h1 {
     color: $white;
     text-decoration: underline;
   }
+
+  & #summaryContainer {
+    p {
+      font-size: 135%;
+    }
+  }
+
+  & #placesContainer {
+    h1 {
+      margin-top: 0px;
+    }
+  }
 }
 
 #dashboard {

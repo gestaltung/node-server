@@ -131,6 +131,9 @@ angular.module('gestaltung.directives', [])
           console.log('places', places);
 
           d3.select('#placesContainer').selectAll("*").remove();
+          placesContainer.append('h1')
+            .text('Places');
+
           placesContainer.selectAll('p')
             .data(places)
             .enter()
